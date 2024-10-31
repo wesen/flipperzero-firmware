@@ -192,6 +192,8 @@ static void input_sequence_timer_callback(void* context) {
     furi_assert(context);
     InputSrvKeySequence* key_sequence = context;
 
+    key_sequence->press_counter++;
+
     if(key_sequence->press_counter == INPUT_SRV_LONG_PRESS_COUNTS) {
         input_send(
             key_sequence->event_pubsub,
@@ -205,8 +207,6 @@ static void input_sequence_timer_callback(void* context) {
             InputTypeRepeat,
             key_sequence->sequence_counter);
     }
-
-    key_sequence->press_counter++;
 }
 
 int32_t input_srv(void* p) {
