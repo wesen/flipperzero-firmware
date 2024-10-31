@@ -9,6 +9,8 @@ void test_furi_pubsub(void);
 void test_furi_memmgr(void);
 void test_furi_event_loop(void);
 void test_errno_saving(void);
+void test_stdin(void);
+void test_stdout(void);
 
 static int foo = 0;
 
@@ -47,6 +49,11 @@ MU_TEST(mu_test_errno_saving) {
     test_errno_saving();
 }
 
+MU_TEST(mu_test_stdio) {
+    test_stdin();
+    test_stdout();
+}
+
 MU_TEST_SUITE(test_suite) {
     MU_SUITE_CONFIGURE(&test_setup, &test_teardown);
     MU_RUN_TEST(test_check);
@@ -56,6 +63,7 @@ MU_TEST_SUITE(test_suite) {
     MU_RUN_TEST(mu_test_furi_pubsub);
     MU_RUN_TEST(mu_test_furi_memmgr);
     MU_RUN_TEST(mu_test_furi_event_loop);
+    MU_RUN_TEST(mu_test_stdio);
     MU_RUN_TEST(mu_test_errno_saving);
 }
 
