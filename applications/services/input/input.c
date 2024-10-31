@@ -20,12 +20,12 @@
 #else
 #define INPUT_LOG(...)
 #endif
+
 typedef struct {
     FuriEventLoopTimer* timer;
     FuriPubSub* event_pubsub;
     uint32_t sequence_counter;
     uint32_t press_counter;
-    InputType type;
     InputKey key;
 } InputSrvKeySequence;
 
@@ -117,8 +117,7 @@ static void input_debounce_timer_callback(void* context) {
                 input_key_sequence_run(
                     &instance->key_sequence[i], InputTypePress, ++instance->sequence_counter);
             } else {
-                input_key_sequence_run(
-                    &instance->key_sequence[i], InputTypeRelease, instance->sequence_counter);
+                input_key_sequence_run(&instance->key_sequence[i], InputTypeRelease, 0);
             }
         }
     }
@@ -128,78 +127,83 @@ static void input_debounce_timer_callback(void* context) {
     }
 }
 
-static inline void input_send(FuriPubSub* pubsub, InputEvent* event) {
-    furi_pubsub_publish(pubsub, event);
+static inline void
+    input_send(FuriPubSub* pubsub, InputKey key, InputType type, uint32_t sequence_counter) {
+    InputEvent event = {
+        .sequence_source = INPUT_SEQUENCE_SOURCE_HARDWARE,
+        .sequence_counter = sequence_counter,
+        .key = key,
+        .type = type,
+    };
+
+    furi_pubsub_publish(pubsub, &event);
     INPUT_LOG(
         "input_send: %s %s %x",
-        input_get_key_name(event->key),
-        input_get_type_name(event->type),
-        event->sequence_counter);
+        input_get_key_name(event.key),
+        input_get_type_name(event.type),
+        event.sequence_counter);
 }
 
 static void input_key_sequence_run(
     InputSrvKeySequence* key_sequence,
     InputType type,
     uint32_t sequence_counter) {
-    InputEvent event;
-
     switch(type) {
     case InputTypePress:
         key_sequence->sequence_counter = sequence_counter;
         key_sequence->press_counter = 0;
-        key_sequence->type = InputTypePress;
 
-        event.sequence_source = INPUT_SEQUENCE_SOURCE_HARDWARE;
-        event.sequence_counter = key_sequence->sequence_counter;
-        event.key = key_sequence->key;
-        event.type = InputTypePress;
-        input_send(key_sequence->event_pubsub, &event);
-
-        furi_check(!furi_event_loop_timer_is_running(key_sequence->timer));
+        furi_assert(!furi_event_loop_timer_is_running(key_sequence->timer));
         furi_event_loop_timer_start(key_sequence->timer, INPUT_SRV_INPUT_LONG_PRESS_TICKS);
 
-        key_sequence->type = InputTypeRepeat;
+        input_send(
+            key_sequence->event_pubsub,
+            key_sequence->key,
+            InputTypePress,
+            key_sequence->sequence_counter);
+
         break;
     case InputTypeRelease:
         if(key_sequence->press_counter < INPUT_SRV_LONG_PRESS_COUNTS) {
-            event.sequence_source = INPUT_SEQUENCE_SOURCE_HARDWARE;
-            event.sequence_counter = key_sequence->sequence_counter;
-            event.key = key_sequence->key;
-            event.type = InputTypeShort;
-            input_send(key_sequence->event_pubsub, &event);
+            input_send(
+                key_sequence->event_pubsub,
+                key_sequence->key,
+                InputTypeShort,
+                key_sequence->sequence_counter);
         }
-        event.sequence_source = INPUT_SEQUENCE_SOURCE_HARDWARE;
-        event.sequence_counter = key_sequence->sequence_counter;
-        event.key = key_sequence->key;
-        event.type = InputTypeRelease;
-        input_send(key_sequence->event_pubsub, &event);
 
+        furi_assert(furi_event_loop_timer_is_running(key_sequence->timer));
         furi_event_loop_timer_stop(key_sequence->timer);
 
-        key_sequence->type = InputTypeRelease;
-        break;
+        input_send(
+            key_sequence->event_pubsub,
+            key_sequence->key,
+            InputTypeRelease,
+            key_sequence->sequence_counter);
 
+        break;
     default:
+        furi_crash();
         break;
     }
 }
+
 static void input_sequence_timer_callback(void* context) {
     furi_assert(context);
     InputSrvKeySequence* key_sequence = context;
-    InputEvent event;
 
     if(key_sequence->press_counter == INPUT_SRV_LONG_PRESS_COUNTS) {
-        event.sequence_source = INPUT_SEQUENCE_SOURCE_HARDWARE;
-        event.sequence_counter = key_sequence->sequence_counter;
-        event.key = key_sequence->key;
-        event.type = InputTypeLong;
-        input_send(key_sequence->event_pubsub, &event);
+        input_send(
+            key_sequence->event_pubsub,
+            key_sequence->key,
+            InputTypeLong,
+            key_sequence->sequence_counter);
     } else if(key_sequence->press_counter > INPUT_SRV_LONG_PRESS_COUNTS) {
-        event.sequence_source = INPUT_SEQUENCE_SOURCE_HARDWARE;
-        event.sequence_counter = key_sequence->sequence_counter;
-        event.key = key_sequence->key;
-        event.type = InputTypeRepeat;
-        input_send(key_sequence->event_pubsub, &event);
+        input_send(
+            key_sequence->event_pubsub,
+            key_sequence->key,
+            InputTypeRepeat,
+            key_sequence->sequence_counter);
     }
 
     key_sequence->press_counter++;
@@ -238,7 +242,6 @@ int32_t input_srv(void* p) {
     for(size_t i = 0; i < input_pins_count; i++) {
         instance->key_sequence[i].sequence_counter = 0;
         instance->key_sequence[i].press_counter = 0;
-        instance->key_sequence[i].type = InputTypeRelease;
         instance->key_sequence[i].key = input_pins[i].key;
         instance->key_sequence[i].timer = furi_event_loop_timer_alloc(
             instance->event_loop,
