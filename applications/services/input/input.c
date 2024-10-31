@@ -81,7 +81,7 @@ static void input_isr_key(void* context) {
     furi_semaphore_release(instance->input_semaphore);
 }
 
-static bool input_semaphore_callback(FuriEventLoopObject* object, void* context) {
+static void input_semaphore_callback(FuriEventLoopObject* object, void* context) {
     furi_assert(context);
     InputSrv* instance = context;
     furi_assert(object == instance->input_semaphore);
@@ -91,7 +91,6 @@ static bool input_semaphore_callback(FuriEventLoopObject* object, void* context)
     if(!furi_event_loop_timer_is_running(instance->debounce_timer)) {
         furi_event_loop_timer_start(instance->debounce_timer, INPUT_SRV_DEBOUNCE_TIMER_TICKS);
     }
-    return true;
 }
 
 static void input_debounce_timer_callback(void* context) {
