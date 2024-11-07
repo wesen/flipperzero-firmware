@@ -21,6 +21,7 @@
 #include "core/timer.h"
 #include "core/string.h"
 #include "core/stream_buffer.h"
+#include "core/pipe.h"
 
 #include <furi_hal_gpio.h>
 
