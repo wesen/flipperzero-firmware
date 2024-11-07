@@ -10,13 +10,13 @@
 #define TAG "BleHid"
 
 #define BLE_SVC_HID_REPORT_MAP_MAX_LEN (255)
-#define BLE_SVC_HID_REPORT_MAX_LEN (255)
-#define BLE_SVC_HID_REPORT_REF_LEN (2)
-#define BLE_SVC_HID_INFO_LEN (4)
-#define BLE_SVC_HID_CONTROL_POINT_LEN (1)
+#define BLE_SVC_HID_REPORT_MAX_LEN     (255)
+#define BLE_SVC_HID_REPORT_REF_LEN     (2)
+#define BLE_SVC_HID_INFO_LEN           (4)
+#define BLE_SVC_HID_CONTROL_POINT_LEN  (1)
 
-#define BLE_SVC_HID_INPUT_REPORT_COUNT (3)
-#define BLE_SVC_HID_OUTPUT_REPORT_COUNT (0)
+#define BLE_SVC_HID_INPUT_REPORT_COUNT   (3)
+#define BLE_SVC_HID_OUTPUT_REPORT_COUNT  (0)
 #define BLE_SVC_HID_FEATURE_REPORT_COUNT (0)
 #define BLE_SVC_HID_REPORT_COUNT                                        \
     (BLE_SVC_HID_INPUT_REPORT_COUNT + BLE_SVC_HID_OUTPUT_REPORT_COUNT + \
@@ -148,15 +148,18 @@ struct BleServiceHid {
     BleGattCharacteristicInstance output_report_chars[BLE_SVC_HID_OUTPUT_REPORT_COUNT];
     BleGattCharacteristicInstance feature_report_chars[BLE_SVC_HID_FEATURE_REPORT_COUNT];
     GapSvcEventHandler* event_handler;
+
+    bool busy;
 };
 
 static BleEventAckStatus ble_svc_hid_event_handler(void* event, void* context) {
-    UNUSED(context);
+    BleServiceHid* hid_svc = context;
 
     BleEventAckStatus ret = BleEventNotAck;
     hci_event_pckt* event_pckt = (hci_event_pckt*)(((hci_uart_pckt*)event)->data);
     evt_blecore_aci* blecore_evt = (evt_blecore_aci*)event_pckt->data;
     // aci_gatt_attribute_modified_event_rp0* attribute_modified;
+
     if(event_pckt->evt == HCI_VENDOR_SPECIFIC_DEBUG_EVT_CODE) {
         if(blecore_evt->ecode == ACI_GATT_ATTRIBUTE_MODIFIED_VSEVT_CODE) {
             // Process modification events
@@ -164,6 +167,9 @@ static BleEventAckStatus ble_svc_hid_event_handler(void* event, void* context) {
         } else if(blecore_evt->ecode == ACI_GATT_SERVER_CONFIRMATION_VSEVT_CODE) {
             // Process notification confirmation
             ret = BleEventAckFlowEnable;
+        } else if(blecore_evt->ecode == ACI_GATT_TX_POOL_AVAILABLE_VSEVT_CODE) {
+            // Ready for TX
+            hid_svc->busy = false;
         }
     }
     return ret;
@@ -171,6 +177,7 @@ static BleEventAckStatus ble_svc_hid_event_handler(void* event, void* context) {
 
 BleServiceHid* ble_svc_hid_start(void) {
     BleServiceHid* hid_svc = malloc(sizeof(BleServiceHid));
+    hid_svc->busy = false;
 
     // Register event handler
     hid_svc->event_handler =
@@ -269,13 +276,27 @@ bool ble_svc_hid_update_input_report(
     furi_assert(data);
     furi_assert(hid_svc);
     furi_assert(input_report_num < BLE_SVC_HID_INPUT_REPORT_COUNT);
+    bool ret = false;
 
     HidSvcDataWrapper report_data = {
         .data_ptr = data,
         .data_len = len,
     };
-    return ble_gatt_characteristic_update(
+
+    ret = ble_gatt_characteristic_update(
         hid_svc->svc_handle, &hid_svc->input_report_chars[input_report_num], &report_data);
+    if(ret) hid_svc->busy = true;
+
+    while(hid_svc->busy) {
+        furi_delay_tick(1);
+
+        if(!hid_svc->busy) {
+            ret = ble_gatt_characteristic_update(
+                hid_svc->svc_handle, &hid_svc->input_report_chars[input_report_num], &report_data);
+        }
+    }
+
+    return ret;
 }
 
 bool ble_svc_hid_update_info(BleServiceHid* hid_svc, uint8_t* data) {

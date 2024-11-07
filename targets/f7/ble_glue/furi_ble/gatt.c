@@ -42,6 +42,7 @@ void ble_gatt_characteristic_init(
         &char_instance->handle);
     if(status) {
         FURI_LOG_E(TAG, "Failed to add %s char: %d", char_descriptor->name, status);
+        furi_assert(false, "Failed to add characteristic");
     }
 
     char_instance->descriptor_handle = 0;
@@ -68,6 +69,7 @@ void ble_gatt_characteristic_init(
             &char_instance->descriptor_handle);
         if(status) {
             FURI_LOG_E(TAG, "Failed to add %s char descriptor: %d", char_descriptor->name, status);
+            furi_assert(false, "Failed to add characteristic descriptor");
         }
         if(release_data) {
             free((void*)char_data);
@@ -82,6 +84,7 @@ void ble_gatt_characteristic_delete(
     if(status) {
         FURI_LOG_E(
             TAG, "Failed to delete %s char: %d", char_instance->characteristic->name, status);
+        furi_assert(false, "Failed to delete characteristic");
     }
     free((void*)char_instance->characteristic);
 }
@@ -114,7 +117,13 @@ bool ble_gatt_characteristic_update(
     tBleStatus result = aci_gatt_update_char_value(
         svc_handle, char_instance->handle, 0, char_data_size, char_data);
     if(result) {
-        FURI_LOG_E(TAG, "Failed updating %s characteristic: %d", char_descriptor->name, result);
+        if(result == BLE_STATUS_INSUFFICIENT_RESOURCES) {
+            FURI_LOG_E(TAG, "Insufficient resources for %s characteristic", char_descriptor->name);
+        } else {
+            FURI_LOG_E(
+                TAG, "Failed updating %s characteristic: %d", char_descriptor->name, result);
+            furi_assert(false, "Failed to update characteristic");
+        }
     }
     if(release_data) {
         free((void*)char_data);
@@ -132,6 +141,7 @@ bool ble_gatt_service_add(
         Service_UUID_Type, Service_UUID, Service_Type, Max_Attribute_Records, Service_Handle);
     if(result) {
         FURI_LOG_E(TAG, "Failed to add service: %x", result);
+        furi_assert(false, "Failed to add service");
     }
 
     return result == BLE_STATUS_SUCCESS;
@@ -141,6 +151,7 @@ bool ble_gatt_service_delete(uint16_t svc_handle) {
     tBleStatus result = aci_gatt_del_service(svc_handle);
     if(result) {
         FURI_LOG_E(TAG, "Failed to delete service: %x", result);
+        furi_assert(false, "Failed to delete service");
     }
 
     return result == BLE_STATUS_SUCCESS;
