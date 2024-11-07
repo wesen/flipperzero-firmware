@@ -74,8 +74,9 @@ typedef int32_t (*FuriThreadCallback)(void* context);
  *
  * @param[in] data pointer to the data to be written to the standard out
  * @param[in] size size of the data in bytes
+ * @param[in] context optional context
  */
-typedef void (*FuriThreadStdoutWriteCallback)(const char* data, size_t size);
+typedef void (*FuriThreadStdoutWriteCallback)(const char* data, size_t size, void* context);
 
 /**
  * @brief Standard input callback function pointer type
@@ -85,9 +86,11 @@ typedef void (*FuriThreadStdoutWriteCallback)(const char* data, size_t size);
  * @param[out] buffer buffer to read data into
  * @param[in] size maximum number of bytes to read into the buffer
  * @param[in] timeout how long to wait for (in ticks) before giving up
+ * @param[in] context optional context
  * @returns number of bytes that was actually read into the buffer
  */
-typedef size_t (*FuriThreadStdinReadCallback)(char* buffer, size_t size, FuriWait timeout);
+typedef size_t (
+    *FuriThreadStdinReadCallback)(char* buffer, size_t size, FuriWait timeout, void* context);
 
 /**
  * @brief         State change callback function pointer type.
@@ -490,14 +493,16 @@ FuriThreadStdinReadCallback furi_thread_get_stdin_callback(void);
 /** Set standard output callback for the current thread.
  *
  * @param[in] callback pointer to the callback function or NULL to clear
+ * @param[in] context context to be passed to the callback
  */
-void furi_thread_set_stdout_callback(FuriThreadStdoutWriteCallback callback);
+void furi_thread_set_stdout_callback(FuriThreadStdoutWriteCallback callback, void* context);
 
 /** Set standard input callback for the current thread.
  * 
  * @param[in] callback pointer to the callback function or NULL to clear
+ * @param[in] context context to be passed to the callback
  */
-void furi_thread_set_stdin_callback(FuriThreadStdinReadCallback callback);
+void furi_thread_set_stdin_callback(FuriThreadStdinReadCallback callback, void* context);
 
 /** Write data to buffered standard output.
  * 

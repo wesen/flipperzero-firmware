@@ -26,11 +26,13 @@
 typedef struct {
     FuriThreadStdoutWriteCallback write_callback;
     FuriString* buffer;
+    void* context;
 } FuriThreadStdout;
 
 typedef struct {
     FuriThreadStdinReadCallback read_callback;
     FuriString* unread_buffer; // <! stores data from `ungetc` and friends
+    void* context;
 } FuriThreadStdin;
 
 struct FuriThread {
@@ -716,7 +718,7 @@ uint32_t furi_thread_get_stack_space(FuriThreadId thread_id) {
 
 static size_t __furi_thread_stdout_write(FuriThread* thread, const char* data, size_t size) {
     if(thread->output.write_callback != NULL) {
-        thread->output.write_callback(data, size);
+        thread->output.write_callback(data, size, thread->output.context);
     } else {
         furi_log_tx((const uint8_t*)data, size);
     }
@@ -726,7 +728,7 @@ static size_t __furi_thread_stdout_write(FuriThread* thread, const char* data, s
 static size_t
     __furi_thread_stdin_read(FuriThread* thread, char* data, size_t size, FuriWait timeout) {
     if(thread->input.read_callback != NULL) {
-        return thread->input.read_callback(data, size, timeout);
+        return thread->input.read_callback(data, size, timeout, thread->input.context);
     } else {
         return 0;
     }
@@ -754,17 +756,19 @@ FuriThreadStdinReadCallback furi_thread_get_stdin_callback(void) {
     return thread->input.read_callback;
 }
 
-void furi_thread_set_stdout_callback(FuriThreadStdoutWriteCallback callback) {
+void furi_thread_set_stdout_callback(FuriThreadStdoutWriteCallback callback, void* context) {
     FuriThread* thread = furi_thread_get_current();
     furi_check(thread);
     __furi_thread_stdout_flush(thread);
     thread->output.write_callback = callback;
+    thread->output.context = context;
 }
 
-void furi_thread_set_stdin_callback(FuriThreadStdinReadCallback callback) {
+void furi_thread_set_stdin_callback(FuriThreadStdinReadCallback callback, void* context) {
     FuriThread* thread = furi_thread_get_current();
     furi_check(thread);
     thread->input.read_callback = callback;
+    thread->input.context = context;
 }
 
 size_t furi_thread_stdout_write(const char* data, size_t size) {
