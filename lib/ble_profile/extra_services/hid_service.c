@@ -149,7 +149,7 @@ struct BleServiceHid {
     BleGattCharacteristicInstance feature_report_chars[BLE_SVC_HID_FEATURE_REPORT_COUNT];
     GapSvcEventHandler* event_handler;
 
-    bool busy;
+    FuriSemaphore* busy;
 };
 
 static BleEventAckStatus ble_svc_hid_event_handler(void* event, void* context) {
@@ -169,7 +169,7 @@ static BleEventAckStatus ble_svc_hid_event_handler(void* event, void* context) {
             ret = BleEventAckFlowEnable;
         } else if(blecore_evt->ecode == ACI_GATT_TX_POOL_AVAILABLE_VSEVT_CODE) {
             // Ready for TX
-            hid_svc->busy = false;
+            furi_semaphore_release(hid_svc->busy);
         }
     }
     return ret;
@@ -177,7 +177,7 @@ static BleEventAckStatus ble_svc_hid_event_handler(void* event, void* context) {
 
 BleServiceHid* ble_svc_hid_start(void) {
     BleServiceHid* hid_svc = malloc(sizeof(BleServiceHid));
-    hid_svc->busy = false;
+    hid_svc->busy = furi_semaphore_alloc(1, 0);
 
     // Register event handler
     hid_svc->event_handler =
@@ -285,15 +285,10 @@ bool ble_svc_hid_update_input_report(
 
     ret = ble_gatt_characteristic_update(
         hid_svc->svc_handle, &hid_svc->input_report_chars[input_report_num], &report_data);
-    if(ret) hid_svc->busy = true;
-
-    while(hid_svc->busy) {
-        furi_delay_tick(1);
-
-        if(!hid_svc->busy) {
-            ret = ble_gatt_characteristic_update(
-                hid_svc->svc_handle, &hid_svc->input_report_chars[input_report_num], &report_data);
-        }
+    if(ret) {
+        furi_semaphore_acquire(hid_svc->busy, FuriWaitForever);
+        ret = ble_gatt_characteristic_update(
+            hid_svc->svc_handle, &hid_svc->input_report_chars[input_report_num], &report_data);
     }
 
     return ret;
