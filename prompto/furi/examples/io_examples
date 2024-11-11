@@ -1,0 +1,19 @@
+#!/bin/bash
+
+cat << 'EOC'
+# Input/Output Examples
+Debug applications demonstrating I/O functionality:
+- LED control
+- Speaker testing
+- Vibration examples
+- Display testing
+EOC
+
+echo -e "\n---\n"
+
+# Get I/O debug applications
+pinocchio catter print \
+    -f "display_test.*\.(c|h)$" \
+    -f "vibro_test.*\.(c|h)$" \
+    -f "blink_test.*\.(c|h)$" \
+    -d xml applications/debug

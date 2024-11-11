@@ -1,0 +1,15 @@
+#!/bin/bash
+
+cat << 'EOC'
+# Record System Context
+Service management system handling:
+- System service registration (RECORD_*)
+- Service acquisition (furi_record_open)
+- Service release (furi_record_close)
+Manages singleton services like GUI, Storage, and Notifications.
+EOC
+
+echo -e "\n---\n"
+
+# Get record system implementation
+pinocchio catter print -f "record\.(c|h)$" -d xml furi

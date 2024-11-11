@@ -1,0 +1,21 @@
+#!/bin/bash
+
+cat << 'EOC'
+# Communication System Context
+Inter-process communication mechanisms including:
+- Message Queues: For thread-safe data exchange
+- PubSub System: For publish/subscribe pattern implementation
+- Stream Buffers: For continuous data streaming between components
+Essential for thread coordination and data exchange in the Flipper OS.
+EOC
+
+echo -e "\n---\n"
+
+# Get message queue implementation
+pinocchio catter print -f "message_queue\.(c|h)$" -d xml furi
+
+# Get pub/sub system
+pinocchio catter print -f "pubsub\.(c|h)$" -d xml furi
+
+# Get stream buffer implementation
+pinocchio catter print -f "stream_buffer\.(c|h)$" -d xml furi 

@@ -1,0 +1,23 @@
+#!/bin/bash
+
+cat << 'EOC'
+# Security and Crypto
+Security-related functionality including:
+- Cryptographic operations
+- Random number generation
+Essential for secure operations.
+EOC
+
+echo -e "\n---\n"
+
+# Get security related files from furi_hal
+pinocchio catter print \
+    -f "furi_hal_crypto\.(c|h)$" \
+    -f "furi_hal_random\.(c|h)$" \
+    -d xml targets/f7/furi_hal
+
+# Get security related files from furi_hal_include
+pinocchio catter print \
+    -f "furi_hal_crypto\.(c|h)$" \
+    -f "furi_hal_random\.(c|h)$" \
+    -d xml targets/furi_hal_include

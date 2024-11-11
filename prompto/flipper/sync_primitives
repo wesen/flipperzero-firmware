@@ -1,0 +1,17 @@
+#!/bin/bash
+
+cat << 'EOC'
+# Synchronization Primitives Context
+Thread synchronization mechanisms including:
+- Mutex: For mutual exclusion (furi_mutex_*)
+- Semaphores: For resource management
+Ensures thread-safe operations and resource coordination.
+EOC
+
+echo -e "\n---\n"
+
+# Get mutex implementation
+pinocchio catter print -f "^mutex\.(c|h)$" -d xml furi
+
+# Get semaphore implementation
+pinocchio catter print -f "^semaphore\.(c|h)$" -d xml furi 

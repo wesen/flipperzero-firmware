@@ -1,0 +1,23 @@
+#!/bin/bash
+
+cat << 'EOC'
+# Peripheral Interface Examples
+Debug applications demonstrating peripheral usage:
+- GPIO testing
+- I2C communication
+- SPI interface demos
+- ADC/PWM examples
+EOC
+
+echo -e "\n---\n"
+
+# Get peripheral debug applications
+pinocchio catter print \
+    -f "expansion_test.*\.(c|h)$" \
+    -f "accessor.*\.(c|h)$" \
+    -d xml applications/debug
+
+# Get I2C-related unit tests
+pinocchio catter print \
+    -f ".*i2c.*\.(c|h)$" \
+    -d xml applications/debug/unit_tests/tests/furi_hal

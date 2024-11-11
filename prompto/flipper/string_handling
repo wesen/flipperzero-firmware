@@ -1,0 +1,14 @@
+#!/bin/bash
+
+cat << 'EOC'
+# String Handling Context
+String manipulation subsystem containing:
+- String operations
+- Text processing utilities
+Essential for text manipulation throughout the Flipper OS.
+EOC
+
+echo -e "\n---\n"
+
+# Get string implementation
+pinocchio catter print -f "string\.(c|h)$" -d xml furi

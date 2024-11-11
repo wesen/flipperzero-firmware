@@ -1,0 +1,10 @@
+#!/bin/bash
+
+cat << 'EOC'
+# Furi library headers
+EOC
+
+echo -e "\n---\n"
+
+# Get core initialization and main system files
+pinocchio catter print -i.h furi

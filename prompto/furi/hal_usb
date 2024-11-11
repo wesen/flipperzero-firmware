@@ -1,0 +1,26 @@
+#!/bin/bash
+
+cat << 'EOC'
+# USB and Serial Communication
+USB and serial communication interfaces including:
+- USB CDC (Serial)
+- USB HID
+- USB CCID
+- USB U2F
+- UART/Serial interfaces
+Essential for device communication.
+EOC
+
+echo -e "\n---\n"
+
+# Get USB and serial related files from furi_hal
+pinocchio catter print \
+    -f "furi_hal_usb.*\.(c|h)$" \
+    -f "furi_hal_serial.*\.(c|h)$" \
+    -d xml targets/f7/furi_hal
+
+# Get USB and serial related files from furi_hal_include
+pinocchio catter print \
+    -f "furi_hal_usb.*\.(c|h)$" \
+    -f "furi_hal_serial.*\.(c|h)$" \
+    -d xml targets/furi_hal_include

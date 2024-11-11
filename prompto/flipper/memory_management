@@ -1,0 +1,20 @@
+#!/bin/bash
+
+cat << 'EOC'
+# Memory Management Context
+Memory management subsystem containing:
+- Memory Manager: Core memory allocation and tracking
+- Heap Implementation: Dynamic memory management
+Ensures proper resource allocation and prevents memory leaks.
+EOC
+
+echo -e "\n---\n"
+
+prompto get flipper/general
+
+# Get memory manager implementation
+pinocchio catter print -f "^memmgr.*\.(c|h)$" \
+    -d xml furi
+
+# Get heap implementation
+pinocchio catter print -f "memmgr_heap\.(c|h)$" -d xml furi

@@ -1,0 +1,22 @@
+#!/bin/bash
+
+cat << 'EOC'
+# Power Management Examples
+Debug applications demonstrating power functionality:
+- Battery monitoring
+- Power mode testing
+- RTC examples
+- Region configuration tests
+EOC
+
+echo -e "\n---\n"
+
+# Get power-related debug applications
+pinocchio catter print \
+    -f "power_test.*\.(c|h)$" \
+    -d xml applications/debug
+
+# Get power-related unit tests
+pinocchio catter print \
+    -f "power.*\.(c|h)$" \
+    -d xml applications/debug/unit_tests/tests

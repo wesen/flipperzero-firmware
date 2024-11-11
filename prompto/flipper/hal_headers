@@ -1,0 +1,10 @@
+#!/bin/bash
+
+cat << 'EOC'
+# Furi HAL layer headers
+EOC
+
+echo -e "\n---\n"
+
+# Get message queue implementation
+pinocchio catter print -i.h targets/f7/furi_hal targets/furi_hal_include -d xml

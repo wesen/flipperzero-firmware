@@ -1,0 +1,16 @@
+#!/bin/bash
+
+cat << 'EOC'
+# Logging System Context
+System-wide logging implementation providing:
+- Debug level logging (FURI_LOG_D)
+- Info level logging (FURI_LOG_I)
+- Warning level logging (FURI_LOG_W)
+- Error level logging (FURI_LOG_E)
+Essential for system debugging and monitoring.
+EOC
+
+echo -e "\n---\n"
+
+# Get logging implementation
+pinocchio catter print -f "log\.(c|h)$" -d xml furi

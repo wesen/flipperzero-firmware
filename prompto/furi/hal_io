@@ -1,0 +1,29 @@
+#!/bin/bash
+
+cat << 'EOC'
+# Input/Output
+I/O functionality including:
+- Light control
+- Speaker
+- Vibration
+- iButton
+Essential for user interaction.
+EOC
+
+echo -e "\n---\n"
+
+# Get I/O related files from furi_hal
+pinocchio catter print \
+    -f "furi_hal_light\.(c|h)$" \
+    -f "furi_hal_speaker\.(c|h)$" \
+    -f "furi_hal_vibro\.(c|h)$" \
+    -f "furi_hal_ibutton\.(c|h)$" \
+    -d xml targets/f7/furi_hal
+
+# Get I/O related files from furi_hal_include
+pinocchio catter print \
+    -f "furi_hal_light\.(c|h)$" \
+    -f "furi_hal_speaker\.(c|h)$" \
+    -f "furi_hal_vibro\.(c|h)$" \
+    -f "furi_hal_ibutton\.(c|h)$" \
+    -d xml targets/furi_hal_include

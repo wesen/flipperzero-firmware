@@ -1,0 +1,32 @@
+#!/bin/bash
+
+cat << 'EOC'
+# Wireless Communication
+Wireless communication interfaces including:
+- Bluetooth
+- SubGHz
+- NFC
+- RFID
+- Infrared
+Essential for wireless protocols support.
+EOC
+
+echo -e "\n---\n"
+
+# Get wireless related files from furi_hal
+pinocchio catter print \
+    -f "furi_hal_bt\.(c|h)$" \
+    -f "furi_hal_subghz\.(c|h)$" \
+    -f "furi_hal_nfc.*\.(c|h)$" \
+    -f "furi_hal_rfid\.(c|h)$" \
+    -f "furi_hal_infrared\.(c|h)$" \
+    -d xml targets/f7/furi_hal
+
+# Get wireless related files from furi_hal_include
+pinocchio catter print \
+    -f "furi_hal_bt\.(c|h)$" \
+    -f "furi_hal_subghz\.(c|h)$" \
+    -f "furi_hal_nfc.*\.(c|h)$" \
+    -f "furi_hal_rfid\.(c|h)$" \
+    -f "furi_hal_infrared\.(c|h)$" \
+    -d xml targets/furi_hal_include

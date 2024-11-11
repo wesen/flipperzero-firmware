@@ -1,0 +1,37 @@
+#!/bin/bash
+
+cat << 'EOC'
+# Core HAL Functionality
+Core hardware abstraction components including:
+- Clock management
+- Interrupt handling
+- DMA operations
+- MPU configuration
+- Memory management
+- Bus control
+Essential low-level hardware control.
+EOC
+
+echo -e "\n---\n"
+
+# Get core HAL files from furi_hal
+pinocchio catter print \
+    -f "furi_hal_clock\.(c|h)$" \
+    -f "furi_hal_interrupt\.(c|h)$" \
+    -f "furi_hal_dma\.(c|h)$" \
+    -f "furi_hal_mpu\.(c|h)$" \
+    -f "furi_hal_memory\.(c|h)$" \
+    -f "furi_hal_bus\.(c|h)$" \
+    -f "furi_hal_cortex\.(c|h)$" \
+    -d xml targets/f7/furi_hal
+
+# Get core HAL files from furi_hal_include
+pinocchio catter print \
+    -f "furi_hal_clock\.(c|h)$" \
+    -f "furi_hal_interrupt\.(c|h)$" \
+    -f "furi_hal_dma\.(c|h)$" \
+    -f "furi_hal_mpu\.(c|h)$" \
+    -f "furi_hal_memory\.(c|h)$" \
+    -f "furi_hal_bus\.(c|h)$" \
+    -f "furi_hal_cortex\.(c|h)$" \
+    -d xml targets/furi_hal_include

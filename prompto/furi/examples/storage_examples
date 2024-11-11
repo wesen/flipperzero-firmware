@@ -1,0 +1,17 @@
+#!/bin/bash
+
+cat << 'EOC'
+# Storage and Memory Examples
+Debug applications demonstrating storage functionality:
+- SD card operations
+- File system tests
+- Flash memory examples
+EOC
+
+echo -e "\n---\n"
+
+# Get storage-related debug applications
+pinocchio catter print \
+    -f "file_browser_test.*\.(c|h)$" \
+    -f "storage_test.*\.(c|h)$" \
+    -d xml applications/debug

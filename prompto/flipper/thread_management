@@ -1,0 +1,20 @@
+#!/bin/bash
+
+cat << 'EOC'
+# Thread Management Context
+Threading subsystem containing:
+- Thread creation and management (furi_thread_*)
+- Thread priorities (FuriThreadPriority*)
+- Thread list management
+Implements the cooperative threading model of Flipper OS.
+EOC
+
+echo -e "\n---\n"
+
+# Get thread-related files
+pinocchio catter print -f "^thread.*\.(c|h)$" \
+    --exclude-match-filename "_test\." \
+    -d xml furi
+
+# Get thread list implementation
+pinocchio catter print -f "thread_list\.(c|h)$" -d xml furi

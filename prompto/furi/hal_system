@@ -1,0 +1,29 @@
+#!/bin/bash
+
+cat << 'EOC'
+# System and Debug
+System-level functionality including:
+- OS abstraction
+- Debug interfaces
+- Resource management
+- Information queries
+Essential for system operation.
+EOC
+
+echo -e "\n---\n"
+
+# Get system level files from furi_hal
+pinocchio catter print \
+    -f "furi_hal_os\.(c|h)$" \
+    -f "furi_hal_debug\.(c|h)$" \
+    -f "furi_hal_resources\.(c|h)$" \
+    -f "furi_hal_info\.(c|h)$" \
+    -d xml targets/f7/furi_hal
+
+# Get system level files from furi_hal_include
+pinocchio catter print \
+    -f "furi_hal_os\.(c|h)$" \
+    -f "furi_hal_debug\.(c|h)$" \
+    -f "furi_hal_resources\.(c|h)$" \
+    -f "furi_hal_info\.(c|h)$" \
+    -d xml targets/furi_hal_include

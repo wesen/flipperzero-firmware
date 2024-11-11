@@ -1,0 +1,22 @@
+#!/bin/bash
+
+cat << 'EOC'
+# Event System Context
+Core event handling system containing:
+- Event Loop: Core event processing mechanism
+- Event Flags: For event signaling between threads
+- Timer System: For both one-shot and periodic timer events (FuriTimer)
+Handles asynchronous operations and timing in the Flipper OS.
+EOC
+
+echo -e "\n---\n"
+
+# Get event loop implementation
+pinocchio catter print -f "event_loop.*\.(c|h)$" \
+    -f "event_flag\.(c|h)$" \
+    -d xml furi
+
+# Get timer implementation
+pinocchio catter print -f "^timer\.(c|h)$" \
+    -f "event_loop_timer.*\.(c|h)$" \
+    -d xml furi

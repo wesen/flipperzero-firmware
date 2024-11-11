@@ -1,0 +1,23 @@
+#!/bin/bash
+
+cat << 'EOC'
+# Core HAL Examples
+Debug applications demonstrating core HAL usage including:
+- Event loop testing
+- Memory management examples
+- Interrupt handling demos
+- System timing tests
+EOC
+
+echo -e "\n---\n"
+
+# Get core-related debug applications
+pinocchio catter print \
+    -f "event_loop.*\.(c|h)$" \
+    -f "crash_test.*\.(c|h)$" \
+    -d xml applications/debug
+
+# Get core-related unit tests
+pinocchio catter print \
+    -f ".*\.(c|h)$" \
+    -d xml applications/debug/unit_tests/tests/furi_hal

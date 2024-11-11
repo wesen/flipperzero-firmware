@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# Get example files showing system usage
+pinocchio catter print \
+    -d xml applications/examples

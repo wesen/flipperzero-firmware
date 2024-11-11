@@ -1,0 +1,22 @@
+#!/bin/bash
+
+cat << 'EOC'
+# Core System Context
+Foundational Furi system files and core definitions containing:
+- Basic assertions (furi_assert, furi_check)
+- System delays
+- Logging functionality (FURI_LOG_*)
+Forms the backbone of the Flipper system.
+EOC
+
+echo -e "\n---\n"
+
+# Get core initialization and main system files
+pinocchio catter print -f "^furi\..*" -f "^flipper\..*" \
+    --exclude-dirs tests \
+    -d xml furi
+
+# Get core definitions and base types
+pinocchio catter print -f "common_defines\.h$" -f "base\.h$" \
+    -f "check\.h$" -f "core_defines\.h$" \
+    -d xml furi

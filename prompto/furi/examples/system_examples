@@ -1,0 +1,21 @@
+#!/bin/bash
+
+cat << 'EOC'
+# System and Debug Examples
+Debug applications demonstrating system functionality:
+- Resource management
+- Debug interface usage
+- System information queries
+EOC
+
+echo -e "\n---\n"
+
+# Get system-related unit tests
+pinocchio catter print \
+    -f "furi.*\.(c|h)$" \
+    -d xml applications/debug/unit_tests/tests
+
+# Get debug test applications
+pinocchio catter print \
+    -f "debug_test.*\.(c|h)$" \
+    -d xml applications/debug

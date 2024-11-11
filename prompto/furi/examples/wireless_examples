@@ -1,0 +1,21 @@
+#!/bin/bash
+
+cat << 'EOC'
+# Wireless Communication Examples
+Debug applications demonstrating wireless protocols:
+- Bluetooth testing
+- SubGHz testing
+- NFC demos
+- RFID examples
+- Infrared testing
+EOC
+
+echo -e "\n---\n"
+
+# Get wireless debug applications
+pinocchio catter print \
+    -f "bt_debug.*\.(c|h)$" \
+    -f "subghz_test.*\.(c|h)$" \
+    -f "lfrfid_debug.*\.(c|h)$" \
+    -f "infrared_test.*\.(c|h)$" \
+    -d xml applications/debug

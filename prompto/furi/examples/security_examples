@@ -1,0 +1,21 @@
+#!/bin/bash
+
+cat << 'EOC'
+# Security and Crypto Examples
+Debug applications demonstrating security features:
+- Crypto operation tests
+- Random number generation
+- Security protocol testing
+EOC
+
+echo -e "\n---\n"
+
+# Get crypto-related unit tests
+pinocchio catter print \
+    -f "furi_hal_crypto.*\.(c|h)$" \
+    -d xml applications/debug/unit_tests/tests
+
+# Get crypto debug applications
+pinocchio catter print \
+    -f "crypto_test.*\.(c|h)$" \
+    -d xml applications/debug

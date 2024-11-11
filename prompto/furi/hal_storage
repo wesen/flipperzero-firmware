@@ -1,0 +1,26 @@
+#!/bin/bash
+
+cat << 'EOC'
+# Storage and Memory
+Storage and memory management including:
+- SD card interface
+- Flash memory
+- Version information
+Essential for data persistence.
+EOC
+
+echo -e "\n---\n"
+
+# Get storage related files from furi_hal
+pinocchio catter print \
+    -f "furi_hal_sd\.(c|h)$" \
+    -f "furi_hal_flash\.(c|h)$" \
+    -f "furi_hal_version.*\.(c|h)$" \
+    -d xml targets/f7/furi_hal
+
+# Get storage related files from furi_hal_include
+pinocchio catter print \
+    -f "furi_hal_sd\.(c|h)$" \
+    -f "furi_hal_flash\.(c|h)$" \
+    -f "furi_hal_version.*\.(c|h)$" \
+    -d xml targets/furi_hal_include

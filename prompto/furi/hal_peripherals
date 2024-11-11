@@ -1,0 +1,32 @@
+#!/bin/bash
+
+cat << 'EOC'
+# Peripherals
+Peripheral interfaces including:
+- GPIO
+- I2C
+- SPI
+- ADC
+- PWM
+Essential for external device communication.
+EOC
+
+echo -e "\n---\n"
+
+# Get peripheral interface files from furi_hal
+pinocchio catter print \
+    -f "furi_hal_gpio\.(c|h)$" \
+    -f "furi_hal_i2c.*\.(c|h)$" \
+    -f "furi_hal_spi.*\.(c|h)$" \
+    -f "furi_hal_adc\.(c|h)$" \
+    -f "furi_hal_pwm\.(c|h)$" \
+    -d xml targets/f7/furi_hal
+
+# Get peripheral interface files from furi_hal_include
+pinocchio catter print \
+    -f "furi_hal_gpio\.(c|h)$" \
+    -f "furi_hal_i2c.*\.(c|h)$" \
+    -f "furi_hal_spi.*\.(c|h)$" \
+    -f "furi_hal_adc\.(c|h)$" \
+    -f "furi_hal_pwm\.(c|h)$" \
+    -d xml targets/furi_hal_include

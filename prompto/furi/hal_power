@@ -1,0 +1,27 @@
+#!/bin/bash
+
+cat << 'EOC'
+# Power Management
+Power-related functionality including:
+- Battery management
+- Power modes
+- RTC (Real-Time Clock)
+- Region settings
+Essential for power control and timing.
+EOC
+
+echo -e "\n---\n"
+
+# Get power management files from furi_hal
+pinocchio catter print \
+    -f "furi_hal_power.*\.(c|h)$" \
+    -f "furi_hal_rtc\.(c|h)$" \
+    -f "furi_hal_region\.(c|h)$" \
+    -d xml targets/f7/furi_hal
+
+# Get power management files from furi_hal_include
+pinocchio catter print \
+    -f "furi_hal_power.*\.(c|h)$" \
+    -f "furi_hal_rtc\.(c|h)$" \
+    -f "furi_hal_region\.(c|h)$" \
+    -d xml targets/furi_hal_include

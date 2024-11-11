@@ -1,0 +1,20 @@
+#!/bin/bash
+
+cat << 'EOC'
+# USB and Serial Examples
+Debug applications demonstrating USB and serial functionality:
+- USB CDC echo applications
+- USB HID demos
+- UART/Serial tests
+- USB CCID examples
+EOC
+
+echo -e "\n---\n"
+
+# Get USB and serial debug applications
+pinocchio catter print \
+    -f "uart_echo.*\.(c|h)$" \
+    -f "usb_test.*\.(c|h)$" \
+    -f "usb_mouse.*\.(c|h)$" \
+    -f "ccid_test.*\.(c|h)$" \
+    -d xml applications/debug
