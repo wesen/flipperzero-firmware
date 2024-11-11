@@ -1,0 +1,9 @@
+App(
+    appid="gpio_toggle",
+    name="GPIO Toggle",
+    apptype=FlipperAppType.EXTERNAL,
+    entry_point="gpio_toggle_app",
+    requires=["gui"],
+    stack_size=2 * 1024,
+    fap_category="GPIO",
+)

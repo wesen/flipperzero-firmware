@@ -1,0 +1,12 @@
+App(
+    appid="gpio_loop",
+    name="GPIO Loop Demo",
+    apptype=FlipperAppType.EXTERNAL,
+    entry_point="gpio_loop_app",
+    stack_size=2 * 1024,
+    fap_category="GPIO",
+    fap_author="Community",
+    fap_weburl="https://github.com/flipperdevices/flipperzero-firmware/tree/dev/applications_user/gpio_loop",
+    fap_version="1.0",
+    fap_description="GPIO pin cycling demo with timing",
+)
