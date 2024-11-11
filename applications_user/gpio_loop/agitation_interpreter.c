@@ -1,8 +1,7 @@
 #include <string.h>
-#include <stdio.h>
 #include "agitation_interpreter.h"
 
-#define DEBUG 1
+// #define DEBUG 1
 
 #ifdef DEBUG
 #define DEBUG_PRINT(fmt, ...) printf(fmt, ##__VA_ARGS__)
@@ -68,11 +67,11 @@ static void
 
 // New helper function to push loop context
 static void push_loop_context(
-    AgitationInterpreterState* state, 
-    const struct AgitationMovementStatic* loop_sequence, 
-    size_t loop_length, 
+    AgitationInterpreterState* state,
+    const struct AgitationMovementStatic* loop_sequence,
+    size_t loop_length,
     uint32_t loop_count) {
-    if (state->loop_depth >= MAX_LOOP_DEPTH) {
+    if(state->loop_depth >= MAX_LOOP_DEPTH) {
         DEBUG_PRINT("Max loop depth reached, cannot push loop context\n");
         return;
     }
@@ -81,10 +80,10 @@ static void push_loop_context(
     state->loop_stack[state->loop_depth].sequence = state->current_sequence;
     state->loop_stack[state->loop_depth].sequence_length = state->sequence_length;
     state->loop_stack[state->loop_depth].start_index = state->current_index;
-    
+
     // Store original count and set remaining iterations
     state->loop_stack[state->loop_depth].original_count = loop_count;
-    state->loop_stack[state->loop_depth].remaining_iterations = 
+    state->loop_stack[state->loop_depth].remaining_iterations =
         (loop_count == LOOP_CONTINUOUS) ? loop_count : loop_count;
 
     // Switch to loop sequence
@@ -98,7 +97,7 @@ static void push_loop_context(
 
 // New helper function to pop loop context
 static bool pop_loop_context(AgitationInterpreterState* state) {
-    if (state->loop_depth == 0) {
+    if(state->loop_depth == 0) {
         DEBUG_PRINT("Cannot pop loop context, already at root\n");
         return false;
     }
@@ -118,11 +117,11 @@ static bool pop_loop_context(AgitationInterpreterState* state) {
 
 bool agitation_interpreter_tick(AgitationInterpreterState* state) {
     // Check for loop end at the start of the tick
-    if (state->current_index >= state->sequence_length) {
+    if(state->current_index >= state->sequence_length) {
         // Check if we're in a loop
-        if (state->loop_depth > 0) {
+        if(state->loop_depth > 0) {
             // Decrement loop iterations only if not continuous
-            if (state->loop_stack[state->loop_depth - 1].original_count != LOOP_CONTINUOUS) {
+            if(state->loop_stack[state->loop_depth - 1].original_count != LOOP_CONTINUOUS) {
                 state->loop_stack[state->loop_depth - 1].remaining_iterations--;
             }
 
@@ -132,14 +131,14 @@ bool agitation_interpreter_tick(AgitationInterpreterState* state) {
                 state->loop_stack[state->loop_depth - 1].remaining_iterations);
 
             // Check if we should continue looping
-            if (state->loop_stack[state->loop_depth - 1].original_count == LOOP_CONTINUOUS || 
-                state->loop_stack[state->loop_depth - 1].remaining_iterations > 0) {
+            if(state->loop_stack[state->loop_depth - 1].original_count == LOOP_CONTINUOUS ||
+               state->loop_stack[state->loop_depth - 1].remaining_iterations > 0) {
                 // Reset to start of loop sequence
                 state->current_index = 0;
                 DEBUG_PRINT("Continuing loop, reset to start\n");
             } else {
                 // Pop loop context
-                if (!pop_loop_context(state)) {
+                if(!pop_loop_context(state)) {
                     DEBUG_PRINT("No more sequences, stopping movement\n");
                     stop_current_movement(state);
                     return false;
@@ -153,7 +152,7 @@ bool agitation_interpreter_tick(AgitationInterpreterState* state) {
     }
 
     // Decrement time remaining for current movement
-    if (state->time_remaining > 0) {
+    if(state->time_remaining > 0) {
         state->time_remaining--;
         DEBUG_PRINT("Tick: Time remaining %u\n", state->time_remaining);
         return true;
@@ -193,14 +192,13 @@ bool agitation_interpreter_tick(AgitationInterpreterState* state) {
 
         case AgitationMovementTypeLoop:
             DEBUG_PRINT("Entering loop processing\n");
-            
+
             // Use the new push_loop_context helper
             push_loop_context(
-                state, 
-                current_movement->loop.sequence, 
-                current_movement->loop.sequence_length, 
-                current_movement->loop.count
-            );
+                state,
+                current_movement->loop.sequence,
+                current_movement->loop.sequence_length,
+                current_movement->loop.count);
             break;
 
         default:
@@ -215,7 +213,7 @@ bool agitation_interpreter_tick(AgitationInterpreterState* state) {
             // Check if we're in a loop
             if(state->loop_depth > 0) {
                 // Decrement loop iterations only if not continuous
-                if (state->loop_stack[state->loop_depth - 1].original_count != LOOP_CONTINUOUS) {
+                if(state->loop_stack[state->loop_depth - 1].original_count != LOOP_CONTINUOUS) {
                     state->loop_stack[state->loop_depth - 1].remaining_iterations--;
                 }
 
@@ -225,14 +223,14 @@ bool agitation_interpreter_tick(AgitationInterpreterState* state) {
                     state->loop_stack[state->loop_depth - 1].remaining_iterations);
 
                 // Check if we should continue looping
-                if(state->loop_stack[state->loop_depth - 1].original_count == LOOP_CONTINUOUS || 
-                    state->loop_stack[state->loop_depth - 1].remaining_iterations > 0) {
+                if(state->loop_stack[state->loop_depth - 1].original_count == LOOP_CONTINUOUS ||
+                   state->loop_stack[state->loop_depth - 1].remaining_iterations > 0) {
                     // Reset to start of loop sequence
                     state->current_index = 0;
                     DEBUG_PRINT("Continuing loop, reset to start\n");
                 } else {
                     // Pop loop context
-                    if (!pop_loop_context(state)) {
+                    if(!pop_loop_context(state)) {
                         DEBUG_PRINT("No more sequences, stopping movement\n");
                         stop_current_movement(state);
                         return false;

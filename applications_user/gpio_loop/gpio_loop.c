@@ -3,26 +3,61 @@
 #include <gui/gui.h>
 #include <gui/elements.h>
 #include <gui/view_port.h>
-
-typedef enum {
-    GpioStatePin1On,
-    GpioStatePin1Wait,
-    GpioStatePin2On,
-    GpioStatePin2Wait,
-} GpioState;
+#include "agitation_sequence.h"
+#include "agitation_processes.h"
+#include "agitation_process_interpreter.h"
 
 typedef struct {
     FuriEventLoop* event_loop;
     ViewPort* view_port;
     Gui* gui;
     FuriEventLoopTimer* state_timer;
-    GpioState current_state;
-    uint32_t time_remaining;
+    
+    // Process state
+    AgitationProcessInterpreterState process_state;
+    const AgitationProcessStatic* current_process;
+    bool process_active;
+    
+    // Display info
+    char status_text[64];
+    char step_text[32];
+    char movement_text[32];
+    
+    // Additional state tracking
+    bool paused;
 } GpioLoopApp;
 
-// Define our GPIO pins
-const GpioPin* const pin1 = &gpio_ext_pa7;
-const GpioPin* const pin2 = &gpio_ext_pa6;
+// Define our GPIO pins (active low)
+const GpioPin* const pin_cw = &gpio_ext_pa7;
+const GpioPin* const pin_ccw = &gpio_ext_pa6;
+
+static void motor_stop() {
+    // Set both pins high (inactive) for active low
+    furi_hal_gpio_write(pin_cw, true);
+    furi_hal_gpio_write(pin_ccw, true);
+}
+
+static void motor_cw_callback(bool enable) {
+    if(enable) {
+        // Safety check - ensure other motor is stopped first
+        furi_hal_gpio_write(pin_ccw, true); // Disable CCW
+        furi_delay_us(1000); // 1ms delay for safety
+        furi_hal_gpio_write(pin_cw, false); // Enable CW (active low)
+    } else {
+        furi_hal_gpio_write(pin_cw, true); // Disable CW
+    }
+}
+
+static void motor_ccw_callback(bool enable) {
+    if(enable) {
+        // Safety check - ensure other motor is stopped first
+        furi_hal_gpio_write(pin_cw, true); // Disable CW
+        furi_delay_us(1000); // 1ms delay for safety
+        furi_hal_gpio_write(pin_ccw, false); // Enable CCW (active low)
+    } else {
+        furi_hal_gpio_write(pin_ccw, true); // Disable CCW
+    }
+}
 
 static void draw_callback(Canvas* canvas, void* context) {
     GpioLoopApp* app = context;
@@ -31,79 +66,69 @@ static void draw_callback(Canvas* canvas, void* context) {
     canvas_set_font(canvas, FontPrimary);
     
     // Draw title
-    canvas_draw_str(canvas, 2, 12, "GPIO Loop Demo");
+    canvas_draw_str(canvas, 2, 12, "C41 Process");
+    
+    // Draw current step info
+    canvas_set_font(canvas, FontSecondary);
+    canvas_draw_str(canvas, 2, 24, app->step_text);
     
     // Draw status
-    canvas_set_font(canvas, FontSecondary);
-    char status[32];
+    canvas_draw_str(canvas, 2, 36, app->status_text);
     
-    switch(app->current_state) {
-        case GpioStatePin1On:
-            snprintf(status, sizeof(status), "Pin 1: ON (%lds)", app->time_remaining);
-            break;
-        case GpioStatePin1Wait:
-            snprintf(status, sizeof(status), "Wait 1->2 (%lds)", app->time_remaining);
-            break;
-        case GpioStatePin2On:
-            snprintf(status, sizeof(status), "Pin 2: ON (%lds)", app->time_remaining);
-            break;
-        case GpioStatePin2Wait:
-            snprintf(status, sizeof(status), "Wait 2->1 (%lds)", app->time_remaining);
-            break;
+    // Draw movement state
+    canvas_draw_str(canvas, 2, 48, app->movement_text);
+    
+    // Draw pin states (remember these are active low)
+    canvas_draw_str(canvas, 2, 60, "CW:");
+    canvas_draw_str(canvas, 50, 60, !furi_hal_gpio_read(pin_cw) ? "ON" : "OFF");
+    
+    canvas_draw_str(canvas, 2, 70, "CCW:");
+    canvas_draw_str(canvas, 50, 70, !furi_hal_gpio_read(pin_ccw) ? "ON" : "OFF");
+
+    // Draw control hints at the bottom
+    if(app->process_active) {
+        elements_button_center(canvas, app->paused ? "Resume" : "Pause");
+        elements_button_right(canvas, "Skip");
+        elements_button_left(canvas, "Restart");
+    } else {
+        elements_button_center(canvas, "Start");
     }
-    
-    canvas_draw_str(canvas, 2, 30, status);
-    
-    // Draw pin states
-    canvas_draw_str(canvas, 2, 45, "Pin 1:");
-    canvas_draw_str(canvas, 2, 55, "Pin 2:");
-    
-    canvas_draw_str(
-        canvas,
-        40,
-        45,
-        furi_hal_gpio_read(pin1) ? "HIGH" : "LOW");
-    canvas_draw_str(
-        canvas,
-        40,
-        55,
-        furi_hal_gpio_read(pin2) ? "HIGH" : "LOW");
 }
 
 static void timer_callback(void* context) {
     GpioLoopApp* app = context;
     
-    if(app->time_remaining > 0) {
-        app->time_remaining--;
-        view_port_update(app->view_port);
-        return;
-    }
-    
-    // Time's up, move to next state
-    switch(app->current_state) {
-        case GpioStatePin1On:
-            furi_hal_gpio_write(pin1, false);
-            app->current_state = GpioStatePin1Wait;
-            app->time_remaining = 5;
-            break;
+    if(app->process_active && !app->paused) {
+        // Tick the process interpreter
+        bool still_active = agitation_process_interpreter_tick(&app->process_state);
+        
+        // Update status texts
+        const AgitationStepStatic* current_step = 
+            &app->current_process->steps[app->process_state.current_step_index];
             
-        case GpioStatePin1Wait:
-            furi_hal_gpio_write(pin2, true);
-            app->current_state = GpioStatePin2On;
-            app->time_remaining = 7;
-            break;
+        snprintf(app->step_text, sizeof(app->step_text), 
+            "Step: %s", current_step->name);
             
-        case GpioStatePin2On:
-            furi_hal_gpio_write(pin2, false);
-            app->current_state = GpioStatePin2Wait;
-            app->time_remaining = 12;
-            break;
+        snprintf(app->status_text, sizeof(app->status_text),
+            "%s Temp: %.1f°C (Target: %.1f°C)", 
+            app->paused ? "[PAUSED]" : "",
+            (double)app->process_state.current_temperature,
+            (double)app->process_state.target_temperature);
             
-        case GpioStatePin2Wait:
-            furi_hal_gpio_write(pin1, true);
-            app->current_state = GpioStatePin1On;
-            app->time_remaining = 10;
-            break;
+        // Update movement text based on current state (remember active low)
+        const char* movement_str = "Idle";
+        if(!furi_hal_gpio_read(pin_cw)) {
+            movement_str = "Clockwise";
+        } else if(!furi_hal_gpio_read(pin_ccw)) {
+            movement_str = "Counter-CW";
+        }
+        snprintf(app->movement_text, sizeof(app->movement_text),
+            "Movement: %s", movement_str);
+        
+        app->process_active = still_active;
+        if(!still_active) {
+            motor_stop(); // Ensure motors are stopped when process ends
+        }
     }
     
     view_port_update(app->view_port);
@@ -111,23 +136,66 @@ static void timer_callback(void* context) {
 
 static void input_callback(InputEvent* input_event, void* context) {
     GpioLoopApp* app = context;
-    if(input_event->type == InputTypeShort && input_event->key == InputKeyBack) {
-        furi_event_loop_stop(app->event_loop);
+    
+    if(input_event->type == InputTypeShort) {
+        if(input_event->key == InputKeyOk) {
+            if(!app->process_active) {
+                // Start new process
+                agitation_process_interpreter_init(
+                    &app->process_state,
+                    &C41_FULL_PROCESS_STATIC,
+                    motor_cw_callback,
+                    motor_ccw_callback);
+                app->process_active = true;
+                app->paused = false;
+            } else {
+                // Toggle pause
+                app->paused = !app->paused;
+                if(app->paused) {
+                    motor_stop(); // Stop motors while paused
+                }
+            }
+        } else if(app->process_active && input_event->key == InputKeyRight) {
+            // Skip to next step
+            motor_stop();
+            app->process_state.current_step_index++;
+            if(app->process_state.current_step_index >= app->current_process->steps_length) {
+                // End process if we've skipped past the last step
+                app->process_active = false;
+            }
+        } else if(app->process_active && input_event->key == InputKeyLeft) {
+            // Restart current step
+            motor_stop();
+            agitation_process_interpreter_init(
+                &app->process_state,
+                app->current_process,
+                motor_cw_callback,
+                motor_ccw_callback);
+            app->process_state.current_step_index = 
+                app->process_state.current_step_index; // Stay on current step
+        }
+    } else if(input_event->type == InputTypeShort && input_event->key == InputKeyBack) {
+        if(app->process_active) {
+            // Stop process
+            app->process_active = false;
+            app->paused = false;
+            motor_stop();
+        } else {
+            furi_event_loop_stop(app->event_loop);
+        }
     }
 }
 
 static void gpio_init() {
-    furi_hal_gpio_init_simple(pin1, GpioModeOutputPushPull);
-    furi_hal_gpio_init_simple(pin2, GpioModeOutputPushPull);
-    furi_hal_gpio_write(pin1, false);
-    furi_hal_gpio_write(pin2, false);
+    furi_hal_gpio_init_simple(pin_cw, GpioModeOutputPushPull);
+    furi_hal_gpio_init_simple(pin_ccw, GpioModeOutputPushPull);
+    motor_stop(); // Initialize both pins to inactive state
 }
 
 static void gpio_deinit() {
-    furi_hal_gpio_write(pin1, false);
-    furi_hal_gpio_write(pin2, false);
-    furi_hal_gpio_init_simple(pin1, GpioModeAnalog);
-    furi_hal_gpio_init_simple(pin2, GpioModeAnalog);
+    motor_stop(); // Ensure motors are stopped
+    furi_hal_gpio_init_simple(pin_cw, GpioModeAnalog);
+    furi_hal_gpio_init_simple(pin_ccw, GpioModeAnalog);
 }
 
 int32_t gpio_loop_app(void* p) {
@@ -156,9 +224,12 @@ int32_t gpio_loop_app(void* p) {
     furi_event_loop_timer_start(app->state_timer, 1000); // 1 second intervals
     
     // Set initial state
-    app->current_state = GpioStatePin1On;
-    app->time_remaining = 10;
-    furi_hal_gpio_write(pin1, true);
+    app->current_process = &C41_FULL_PROCESS_STATIC;
+    app->process_active = false;
+    app->paused = false;
+    snprintf(app->status_text, sizeof(app->status_text), "Press OK to start");
+    snprintf(app->step_text, sizeof(app->step_text), "Ready");
+    snprintf(app->movement_text, sizeof(app->movement_text), "Movement: Idle");
     
     // Run event loop
     furi_event_loop_run(app->event_loop);

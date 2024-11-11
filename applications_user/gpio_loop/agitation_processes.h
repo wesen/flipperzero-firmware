@@ -1,6 +1,5 @@
 #pragma once
 
-typedef char FuriString;
 #include "agitation_sequence.h"
 
 //------------------------------------------------------------------------------
@@ -51,7 +50,7 @@ static const AgitationMovementStatic ILFORD_STANDARD[] = {
     {.type = AgitationMovementTypeLoop,
      .loop =
          {.count = 4,
-          .sequence = (const struct     AgitationMovementStatic*)STANDARD_INVERSION,
+          .sequence = (const struct AgitationMovementStatic*)STANDARD_INVERSION,
           .sequence_length = STANDARD_INVERSION_LENGTH}},
     {.type = AgitationMovementTypePause, .duration = 30},
 };
@@ -82,26 +81,29 @@ static const AgitationStepStatic BW_INITIAL_AGITATION_STEP = {
     .description = "First round of agitation to ensure even development",
     .temperature = 20.0f, // Typical B&W development temperature
     .sequence = INITIAL_AGITATION,
-    .sequence_length = INITIAL_AGITATION_LENGTH
-};
+    .sequence_length = INITIAL_AGITATION_LENGTH};
 
 /**
  * @brief Standard B&W Periodic Agitation Step
  */
+static const AgitationMovementStatic BW_PERIODIC_AGITATION_SEQUENCE[] = {
+    {.type = AgitationMovementTypeLoop,
+     .loop = {
+         .count = 2,
+         .sequence = (const struct AgitationMovementStatic*)STANDARD_INVERSION,
+         .sequence_length = STANDARD_INVERSION_LENGTH}}};
+
 static const AgitationStepStatic BW_PERIODIC_AGITATION_STEP = {
     .name = "Periodic Agitation",
     .description = "Continued agitation during development",
-    .temperature = 20.0f, // Maintain consistent temperature
-    .sequence = (const AgitationMovementStatic[]){
-        {.type = AgitationMovementTypeLoop,
-         .loop = {
-             .count = 2,
-             .sequence = (const struct AgitationMovementStatic*)STANDARD_INVERSION,
-             .sequence_length = STANDARD_INVERSION_LENGTH
-         }}
-    },
-    .sequence_length = 1
-};
+    .temperature = 20.0f,
+    .sequence = BW_PERIODIC_AGITATION_SEQUENCE,
+    .sequence_length = 1};
+
+// B&W Standard Development Static Steps
+static const AgitationStepStatic BW_STANDARD_DEV_STEPS[] = {
+    BW_INITIAL_AGITATION_STEP,
+    BW_PERIODIC_AGITATION_STEP};
 
 /**
  * @brief Standard B&W Development Process
@@ -112,43 +114,44 @@ static const AgitationProcessStatic BW_STANDARD_DEV_STATIC = {
     .tank_type = "Developing Tank",
     .chemistry = "B&W Developer",
     .temperature = 20.0f,
-    .steps = (const AgitationStepStatic[]){
-        BW_INITIAL_AGITATION_STEP,
-        BW_PERIODIC_AGITATION_STEP
-    },
-    .steps_length = 2
-};
+    .steps = BW_STANDARD_DEV_STEPS,
+    .steps_length = 2};
 
 /**
  * @brief Stand Development Initial Agitation Step
  */
+static const AgitationMovementStatic STAND_DEV_INITIAL_SEQUENCE[] = {
+    {.type = AgitationMovementTypeLoop,
+     .loop = {
+         .count = 3,
+         .sequence = (const struct AgitationMovementStatic*)STANDARD_INVERSION,
+         .sequence_length = STANDARD_INVERSION_LENGTH}}};
+
 static const AgitationStepStatic STAND_DEV_INITIAL_STEP = {
     .name = "Initial Agitation",
     .description = "Initial agitation before long stand period",
-    .temperature = 20.0f, // Typical B&W development temperature
-    .sequence = (const AgitationMovementStatic[]){
-        {.type = AgitationMovementTypeLoop,
-         .loop = {
-             .count = 3,
-             .sequence = (const struct AgitationMovementStatic*)STANDARD_INVERSION,
-             .sequence_length = STANDARD_INVERSION_LENGTH
-         }}
-    },
-    .sequence_length = 1
-};
+    .temperature = 20.0f,
+    .sequence = STAND_DEV_INITIAL_SEQUENCE,
+    .sequence_length = 1};
 
 /**
  * @brief Stand Development Long Stand Step
  */
+static const AgitationMovementStatic STAND_DEV_LONG_STAND_SEQUENCE[] = {
+    {.type = AgitationMovementTypePause, .duration = 3600} // 1 hour stand
+};
+
 static const AgitationStepStatic STAND_DEV_LONG_STAND_STEP = {
     .name = "Long Stand",
     .description = "Extended period with minimal agitation",
     .temperature = 20.0f,
-    .sequence = (const AgitationMovementStatic[]){
-        {.type = AgitationMovementTypePause, .duration = 3600} // 1 hour stand
-    },
-    .sequence_length = 1
-};
+    .sequence = STAND_DEV_LONG_STAND_SEQUENCE,
+    .sequence_length = 1};
+
+// Stand Development Static Steps
+static const AgitationStepStatic STAND_DEV_STEPS[] = {
+    STAND_DEV_INITIAL_STEP,
+    STAND_DEV_LONG_STAND_STEP};
 
 /**
  * @brief Stand Development Process
@@ -159,12 +162,8 @@ static const AgitationProcessStatic STAND_DEV_STATIC = {
     .tank_type = "Developing Tank",
     .chemistry = "B&W Developer",
     .temperature = 20.0f,
-    .steps = (const AgitationStepStatic[]){
-        STAND_DEV_INITIAL_STEP,
-        STAND_DEV_LONG_STAND_STEP
-    },
-    .steps_length = 2
-};
+    .steps = STAND_DEV_STEPS,
+    .steps_length = 2};
 
 //------------------------------------------------------------------------------
 // Continuous Gentle Agitation Process
@@ -178,9 +177,10 @@ static const AgitationStepStatic CONTINUOUS_GENTLE_STEP = {
     .description = "Gentle, continuous movement for consistent development",
     .temperature = 38.0f, // Typical color development temperature
     .sequence = CONTINUOUS_GENTLE,
-    .sequence_length = CONTINUOUS_GENTLE_LENGTH
-};
+    .sequence_length = CONTINUOUS_GENTLE_LENGTH};
 
+// Continuous Gentle Static Steps
+static const AgitationStepStatic CONTINUOUS_GENTLE_STEPS[] = {CONTINUOUS_GENTLE_STEP};
 /**
  * @brief Continuous Gentle Agitation Process
  */
@@ -190,11 +190,8 @@ static const AgitationProcessStatic CONTINUOUS_GENTLE_STATIC = {
     .tank_type = "Developing Tank",
     .chemistry = "Various",
     .temperature = 38.0f,
-    .steps = (const AgitationStepStatic[]){
-        CONTINUOUS_GENTLE_STEP
-    },
-    .steps_length = 1
-};
+    .steps = CONTINUOUS_GENTLE_STEPS,
+    .steps_length = 1};
 
 //------------------------------------------------------------------------------
 // Color Development Sequences
@@ -240,7 +237,7 @@ static const size_t C41_COLOR_DEVELOPER_LENGTH = 1;
 /**
  * @brief C41 Bleach Stage (Periodic Gentle Agitation)
  */
-static const AgitationMovementStatic C41_BLEACH[] = {
+static const AgitationMovementStatic C41_BLEACH_SEQUENCE[] = {
     {.type = AgitationMovementTypeLoop,
      .loop =
          {.count = 3,
@@ -249,6 +246,12 @@ static const AgitationMovementStatic C41_BLEACH[] = {
     {.type = AgitationMovementTypePause, .duration = 15},
 };
 static const size_t C41_BLEACH_LENGTH = 2;
+static const AgitationStepStatic C41_BLEACH_STEP = {
+    .name = "Bleach",
+    .description = "Bleach stage with periodic gentle agitation",
+    .temperature = 38.0f,
+    .sequence = C41_BLEACH_SEQUENCE,
+    .sequence_length = C41_BLEACH_LENGTH};
 
 /**
  * @brief C41 Stabilizer/Final Rinse Stage (Gentle Agitation)
@@ -284,7 +287,7 @@ static const AgitationMovementStatic C41_FULL_PROCESS[] = {
     {.type = AgitationMovementTypeLoop,
      .loop =
          {.count = 1,
-          .sequence = (const struct AgitationMovementStatic*)C41_BLEACH,
+          .sequence = (const struct AgitationMovementStatic*)C41_BLEACH_SEQUENCE,
           .sequence_length = C41_BLEACH_LENGTH}},
 
     // Stabilizer/Final Rinse
@@ -307,8 +310,7 @@ static const AgitationStepStatic C41_PRE_WASH_STEP = {
     .description = "Optional warm rinse before color development",
     .temperature = 38.0f, // Typical pre-wash temperature
     .sequence = C41_PRE_WASH,
-    .sequence_length = C41_PRE_WASH_LENGTH
-};
+    .sequence_length = C41_PRE_WASH_LENGTH};
 
 /**
  * @brief C41 Color Developer Step
@@ -318,19 +320,7 @@ static const AgitationStepStatic C41_COLOR_DEVELOPER_STEP = {
     .description = "Main color development stage with continuous gentle agitation",
     .temperature = 38.0f, // Standard C41 color developer temperature
     .sequence = C41_COLOR_DEVELOPER,
-    .sequence_length = C41_COLOR_DEVELOPER_LENGTH
-};
-
-/**
- * @brief C41 Bleach Step
- */
-static const AgitationStepStatic C41_BLEACH_STEP = {
-    .name = "Bleach",
-    .description = "Bleach stage with periodic gentle agitation",
-    .temperature = 38.0f, // Typical bleach temperature
-    .sequence = C41_BLEACH,
-    .sequence_length = C41_BLEACH_LENGTH
-};
+    .sequence_length = C41_COLOR_DEVELOPER_LENGTH};
 
 /**
  * @brief C41 Stabilizer Step
@@ -340,8 +330,11 @@ static const AgitationStepStatic C41_STABILIZER_STEP = {
     .description = "Final rinse and stabilization stage",
     .temperature = 38.0f, // Room temperature or slightly warmer
     .sequence = C41_STABILIZER,
-    .sequence_length = C41_STABILIZER_LENGTH
-};
+    .sequence_length = C41_STABILIZER_LENGTH};
+
+// C41 Full Process Static Steps
+static const AgitationStepStatic C41_FULL_PROCESS_STEPS[] =
+    {C41_PRE_WASH_STEP, C41_COLOR_DEVELOPER_STEP, C41_BLEACH_STEP, C41_STABILIZER_STEP};
 
 /**
  * @brief Complete C41 Development Process
@@ -353,11 +346,5 @@ static const AgitationProcessStatic C41_FULL_PROCESS_STATIC = {
     .tank_type = "Developing Tank",
     .chemistry = "C41 Color Chemistry",
     .temperature = 38.0f,
-    .steps = (const AgitationStepStatic[]){
-        C41_PRE_WASH_STEP,
-        C41_COLOR_DEVELOPER_STEP,
-        C41_BLEACH_STEP,
-        C41_STABILIZER_STEP
-    },
-    .steps_length = 4
-};
+    .steps = C41_FULL_PROCESS_STEPS,
+    .steps_length = 4};
