@@ -1,15 +1,17 @@
 CC=gcc
 CFLAGS=-Wall -Wextra -g
-SOURCES=interpreter_test.c \
-        agitation_interpreter.c \
-        agitation_process_interpreter.c
-HEADERS=agitation_interpreter.h \
-        agitation_sequence.h \
-        agitation_processes.h \
-        agitation_process_interpreter.h
+DEBUG=1
 
-interpreter_test: $(SOURCES) $(HEADERS)
-	$(CC) $(CFLAGS) -o $@ $(SOURCES)
+SOURCES_DIR=../../gpio_loop
+SOURCES=$(SOURCES_DIR)/agitation_interpreter.c \
+        $(SOURCES_DIR)/agitation_process_interpreter.c
+HEADERS=$(SOURCES_DIR)/agitation_interpreter.h \
+        $(SOURCES_DIR)/agitation_sequence.h \
+        $(SOURCES_DIR)/agitation_processes.h \
+        $(SOURCES_DIR)/agitation_process_interpreter.h
+
+interpreter_test: interpreter_test.c $(SOURCES) $(HEADERS)
+	$(CC) $(CFLAGS) -DDEBUG=$(DEBUG) -DHOST -I$(SOURCES_DIR) -o $@ interpreter_test.c $(SOURCES)
 
 clean:
 	rm -f interpreter_test 

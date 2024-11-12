@@ -79,6 +79,10 @@ bool agitation_process_interpreter_tick(AgitationProcessInterpreterState* state)
     if(!movement_active) {
         state->current_step_index++;
         state->process_state = AgitationProcessStateIdle;
+
+        if(state->current_step_index >= state->process->steps_length) {
+            state->process_state = AgitationProcessStateComplete;
+        }
     }
 
     return movement_active || state->current_step_index < state->process->steps_length;

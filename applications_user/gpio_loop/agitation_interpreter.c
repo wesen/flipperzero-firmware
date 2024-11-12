@@ -9,6 +9,10 @@
 #define DEBUG_PRINT(fmt, ...)
 #endif
 
+#ifdef HOST
+#include <stdio.h>
+#endif
+
 void agitation_interpreter_init(
     AgitationInterpreterState* state,
     const struct AgitationMovementStatic* sequence,

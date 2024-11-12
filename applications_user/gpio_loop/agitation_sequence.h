@@ -10,9 +10,13 @@ typedef enum {
 #define __bool_true_false_are_defined 1
 #endif
 #endif
+
+#ifndef HOST
 #include <furi.h>
 #include <furi_hal_gpio.h>
-// typedef char FuriString;
+#else
+typedef char FuriString;
+#endif
 
 #include <stddef.h>
 #include <inttypes.h>
