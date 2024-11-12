@@ -2,8 +2,19 @@
 
 #include "agitation_sequence.h"
 
-#define MAX_LOOP_DEPTH 3
+#define MAX_LOOP_DEPTH  3
 #define LOOP_CONTINUOUS 0
+
+typedef struct LoopState {
+    const AgitationMovementStatic* sequence;
+    size_t sequence_length;
+    uint32_t remaining_iterations;
+    size_t start_index;
+    uint32_t original_count;
+    uint32_t elapsed_duration; // Track elapsed time
+    uint32_t max_duration; // Maximum duration for this loop
+    bool stop; // Stop the loop
+} LoopState;
 
 typedef struct AgitationInterpreterState {
     // Current execution context
@@ -12,13 +23,7 @@ typedef struct AgitationInterpreterState {
     size_t current_index;
 
     // Loop tracking
-    struct {
-        const AgitationMovementStatic* sequence;
-        size_t sequence_length;
-        uint32_t remaining_iterations;
-        size_t start_index;
-        uint32_t original_count;
-    } loop_stack[MAX_LOOP_DEPTH];
+    LoopState loop_stack[MAX_LOOP_DEPTH];
     uint8_t loop_depth;
 
     // Current movement details

@@ -3,6 +3,7 @@
 *.swo
 *.gdb_history
 *.old
+.history
 
 
 # LSP

@@ -49,13 +49,6 @@ bool agitation_process_interpreter_tick(AgitationProcessInterpreterState* state)
     // Get current step
     const AgitationStepStatic* current_step = &state->process->steps[state->current_step_index];
 
-    DEBUG_PRINT("Processing Step %zu: %s\n", 
-        state->current_step_index, 
-        current_step->name ? current_step->name : "Unnamed Step");
-    DEBUG_PRINT("  Description: %s\n", 
-        current_step->description ? current_step->description : "No description");
-    DEBUG_PRINT("  Step Temperature: %.1f\n", (double)current_step->temperature);
-
     // Update temperature tracking
     state->target_temperature = current_step->temperature;
 
@@ -63,6 +56,15 @@ bool agitation_process_interpreter_tick(AgitationProcessInterpreterState* state)
     if(state->process_state == AgitationProcessStateIdle ||
        state->process_state == AgitationProcessStateComplete) {
         DEBUG_PRINT("Initializing Movement Interpreter for Step\n");
+        DEBUG_PRINT(
+            "Processing Step %zu: %s\n",
+            state->current_step_index,
+            current_step->name ? current_step->name : "Unnamed Step");
+        DEBUG_PRINT(
+            "  Description: %s\n",
+            current_step->description ? current_step->description : "No description");
+        DEBUG_PRINT("  Step Temperature: %.1f\n", (double)current_step->temperature);
+
         agitation_interpreter_init(
             &state->movement_interpreter,
             current_step->sequence,
@@ -77,6 +79,7 @@ bool agitation_process_interpreter_tick(AgitationProcessInterpreterState* state)
 
     // If movement is no longer active, move to next step
     if(!movement_active) {
+        DEBUG_PRINT("Movement completed, moving to next step\n");
         state->current_step_index++;
         state->process_state = AgitationProcessStateIdle;
 
@@ -90,8 +93,5 @@ bool agitation_process_interpreter_tick(AgitationProcessInterpreterState* state)
 
 void agitation_process_interpreter_reset(AgitationProcessInterpreterState* state) {
     agitation_process_interpreter_init(
-        state,
-        state->process,
-        state->motor_cw_callback,
-        state->motor_ccw_callback);
+        state, state->process, state->motor_cw_callback, state->motor_ccw_callback);
 }

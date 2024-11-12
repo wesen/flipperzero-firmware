@@ -50,9 +50,14 @@ duration: integer        # Duration in seconds
 Represents a repeated sequence of movements.
 ```yaml
 type: "loop"             # Indicates a loop
-count: integer          # Number of times to repeat
+count: integer          # Number of times to repeat (0 for duration-based or infinite)
+max_duration: integer   # Maximum duration in seconds (0 for count-based or infinite)
 sequence: array         # Array of sequence steps to repeat
 ```
+
+If both `count` and `max_duration` are 0, the loop repeats infinitely.
+If `count` is 0 but `max_duration` is set, the loop repeats until the duration is reached.
+If `count` is set but `max_duration` is 0, the loop repeats the specified number of times.
 
 ## Example: Single Inversion
 A complete inversion consists of:

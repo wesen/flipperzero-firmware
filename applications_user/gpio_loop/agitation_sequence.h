@@ -1,15 +1,6 @@
 #pragma once
 
-#ifndef __cplusplus
-// Add bool, true, false definitions for C
-#ifndef __bool_true_false_are_defined
-// typedef enum {
-//     false = 0,
-//     true = 1
-// } bool;
-#define __bool_true_false_are_defined 1
-#endif
-#endif
+#include <stdbool.h>
 
 #ifndef HOST
 #include <furi.h>
@@ -25,10 +16,10 @@ typedef char FuriString;
  * @brief Movement types for agitation sequence
  */
 typedef enum {
-    AgitationMovementTypeCW, // Clockwise movement
-    AgitationMovementTypeCCW, // Counter-clockwise movement
-    AgitationMovementTypePause, // Pause/wait
-    AgitationMovementTypeLoop, // Repeating sequence
+    AgitationMovementTypeCW = 0, // Clockwise movement
+    AgitationMovementTypeCCW = 1, // Counter-clockwise movement
+    AgitationMovementTypePause = 2, // Pause/wait
+    AgitationMovementTypeLoop = 3, // Repeating sequence
 } AgitationMovementType;
 
 //------------------------------------------------------------------------------
@@ -49,7 +40,8 @@ struct AgitationMovementStatic {
         uint32_t duration;
         // For loops
         struct {
-            uint32_t count; // 0 = infinite
+            uint32_t count;        // 0 = use max_duration or infinite
+            uint32_t max_duration; // 0 = use count or infinite
             const AgitationMovementStatic* sequence;
             size_t sequence_length;
         } loop;
@@ -148,6 +140,7 @@ typedef struct {
         {.type = AgitationMovementTypeLoop,                                \
          .loop =                                                           \
              {.count = 4,                                                  \
+              .max_duration = 0,                                           \
               .sequence =                                                  \
                   (AgitationMovementStatic[]){                             \
                       {.type = AgitationMovementTypeCW, .duration = 1},    \
