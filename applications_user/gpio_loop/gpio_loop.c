@@ -12,17 +12,17 @@ typedef struct {
     ViewPort* view_port;
     Gui* gui;
     FuriEventLoopTimer* state_timer;
-    
+
     // Process state
     AgitationProcessInterpreterState process_state;
     const AgitationProcessStatic* current_process;
     bool process_active;
-    
+
     // Display info
     char status_text[64];
     char step_text[32];
     char movement_text[32];
-    
+
     // Additional state tracking
     bool paused;
 } GpioLoopApp;
@@ -61,27 +61,27 @@ static void motor_ccw_callback(bool enable) {
 
 static void draw_callback(Canvas* canvas, void* context) {
     GpioLoopApp* app = context;
-    
+
     canvas_clear(canvas);
     canvas_set_font(canvas, FontPrimary);
-    
+
     // Draw title
     canvas_draw_str(canvas, 2, 12, "C41 Process");
-    
+
     // Draw current step info
     canvas_set_font(canvas, FontSecondary);
     canvas_draw_str(canvas, 2, 24, app->step_text);
-    
+
     // Draw status
     canvas_draw_str(canvas, 2, 36, app->status_text);
-    
+
     // Draw movement state
     canvas_draw_str(canvas, 2, 48, app->movement_text);
-    
+
     // Draw pin states (remember these are active low)
     canvas_draw_str(canvas, 2, 60, "CW:");
     canvas_draw_str(canvas, 50, 60, !furi_hal_gpio_read(pin_cw) ? "ON" : "OFF");
-    
+
     canvas_draw_str(canvas, 2, 70, "CCW:");
     canvas_draw_str(canvas, 50, 70, !furi_hal_gpio_read(pin_ccw) ? "ON" : "OFF");
 
@@ -97,24 +97,55 @@ static void draw_callback(Canvas* canvas, void* context) {
 
 static void timer_callback(void* context) {
     GpioLoopApp* app = context;
-    
+
     if(app->process_active && !app->paused) {
         // Tick the process interpreter
         bool still_active = agitation_process_interpreter_tick(&app->process_state);
-        
+
         // Update status texts
-        const AgitationStepStatic* current_step = 
+        const AgitationStepStatic* current_step =
             &app->current_process->steps[app->process_state.current_step_index];
-            
-        snprintf(app->step_text, sizeof(app->step_text), 
-            "Step: %s", current_step->name);
-            
-        snprintf(app->status_text, sizeof(app->status_text),
-            "%s Temp: %.1f°C (Target: %.1f°C)", 
-            app->paused ? "[PAUSED]" : "",
-            (double)app->process_state.current_temperature,
-            (double)app->process_state.target_temperature);
-            
+
+        snprintf(app->step_text, sizeof(app->step_text), "Step: %s", current_step->name);
+
+        // Get current loop info if in a loop
+        if(app->process_state.movement_interpreter.loop_depth > 0) {
+            // Show elapsed time in current loop
+            uint32_t elapsed =
+                app->process_state.movement_interpreter
+                    .loop_stack[app->process_state.movement_interpreter.loop_depth - 1]
+                    .elapsed_duration;
+            uint32_t max_duration =
+                app->process_state.movement_interpreter
+                    .loop_stack[app->process_state.movement_interpreter.loop_depth - 1]
+                    .max_duration;
+
+            if(max_duration > 0) {
+                snprintf(
+                    app->status_text,
+                    sizeof(app->status_text),
+                    "%s Time: %lus/%lus",
+                    app->paused ? "[PAUSED]" : "",
+                    elapsed,
+                    max_duration);
+            } else {
+                snprintf(
+                    app->status_text,
+                    sizeof(app->status_text),
+                    "%s Time: %lus",
+                    app->paused ? "[PAUSED]" : "",
+                    elapsed);
+            }
+        } else {
+            // Show remaining time for current movement
+            snprintf(
+                app->status_text,
+                sizeof(app->status_text),
+                "%s Time left: %lus",
+                app->paused ? "[PAUSED]" : "",
+                app->process_state.movement_interpreter.time_remaining);
+        }
+
         // Update movement text based on current state (remember active low)
         const char* movement_str = "Idle";
         if(!furi_hal_gpio_read(pin_cw)) {
@@ -122,21 +153,20 @@ static void timer_callback(void* context) {
         } else if(!furi_hal_gpio_read(pin_ccw)) {
             movement_str = "Counter-CW";
         }
-        snprintf(app->movement_text, sizeof(app->movement_text),
-            "Movement: %s", movement_str);
-        
+        snprintf(app->movement_text, sizeof(app->movement_text), "Movement: %s", movement_str);
+
         app->process_active = still_active;
         if(!still_active) {
             motor_stop(); // Ensure motors are stopped when process ends
         }
     }
-    
+
     view_port_update(app->view_port);
 }
 
 static void input_callback(InputEvent* input_event, void* context) {
     GpioLoopApp* app = context;
-    
+
     if(input_event->type == InputTypeShort) {
         if(input_event->key == InputKeyOk) {
             if(!app->process_active) {
@@ -167,11 +197,8 @@ static void input_callback(InputEvent* input_event, void* context) {
             // Restart current step
             motor_stop();
             agitation_process_interpreter_init(
-                &app->process_state,
-                app->current_process,
-                motor_cw_callback,
-                motor_ccw_callback);
-            app->process_state.current_step_index = 
+                &app->process_state, app->current_process, motor_cw_callback, motor_ccw_callback);
+            app->process_state.current_step_index =
                 app->process_state.current_step_index; // Stay on current step
         }
     } else if(input_event->type == InputTypeShort && input_event->key == InputKeyBack) {
@@ -204,25 +231,22 @@ int32_t gpio_loop_app(void* p) {
 
     // Initialize GPIO
     gpio_init();
-    
+
     // Create event loop
     app->event_loop = furi_event_loop_alloc();
-    
+
     // Create GUI
     app->gui = furi_record_open(RECORD_GUI);
     app->view_port = view_port_alloc();
     view_port_draw_callback_set(app->view_port, draw_callback, app);
     view_port_input_callback_set(app->view_port, input_callback, app);
     gui_add_view_port(app->gui, app->view_port, GuiLayerFullscreen);
-    
+
     // Create timer
     app->state_timer = furi_event_loop_timer_alloc(
-        app->event_loop,
-        timer_callback,
-        FuriEventLoopTimerTypePeriodic,
-        app);
+        app->event_loop, timer_callback, FuriEventLoopTimerTypePeriodic, app);
     furi_event_loop_timer_start(app->state_timer, 1000); // 1 second intervals
-    
+
     // Set initial state
     app->current_process = &C41_FULL_PROCESS_STATIC;
     app->process_active = false;
@@ -230,10 +254,10 @@ int32_t gpio_loop_app(void* p) {
     snprintf(app->status_text, sizeof(app->status_text), "Press OK to start");
     snprintf(app->step_text, sizeof(app->step_text), "Ready");
     snprintf(app->movement_text, sizeof(app->movement_text), "Movement: Idle");
-    
+
     // Run event loop
     furi_event_loop_run(app->event_loop);
-    
+
     // Cleanup
     furi_event_loop_timer_free(app->state_timer);
     view_port_enabled_set(app->view_port, false);
@@ -243,6 +267,6 @@ int32_t gpio_loop_app(void* p) {
     furi_event_loop_free(app->event_loop);
     gpio_deinit();
     free(app);
-    
+
     return 0;
-} 
+}
