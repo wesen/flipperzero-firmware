@@ -3,10 +3,10 @@
 #ifndef __cplusplus
 // Add bool, true, false definitions for C
 #ifndef __bool_true_false_are_defined
-typedef enum {
-    false = 0,
-    true = 1
-} bool;
+// typedef enum {
+//     false = 0,
+//     true = 1
+// } bool;
 #define __bool_true_false_are_defined 1
 #endif
 #endif
@@ -132,12 +132,12 @@ typedef struct {
 /**
  * @brief Standard inversion sequence
  */
-#define AGITATION_STANDARD_INVERSION                         \
-    {                                                        \
-        {.type = AgitationMovementTypeCW, .duration = 1},    \
-        {.type = AgitationMovementTypePause, .duration = 1}, \
-        {.type = AgitationMovementTypeCCW, .duration = 1},   \
-        {.type = AgitationMovementTypePause, .duration = 1}, \
+#define AGITATION_STANDARD_INVERSION                             \
+    {                                                            \
+        {.type = AgitationMovementTypeCW, .duration = 1},        \
+            {.type = AgitationMovementTypePause, .duration = 1}, \
+            {.type = AgitationMovementTypeCCW, .duration = 1},   \
+            {.type = AgitationMovementTypePause, .duration = 1}, \
     }
 
 /**
@@ -156,7 +156,7 @@ typedef struct {
                       {.type = AgitationMovementTypePause, .duration = 1}, \
                   },                                                       \
               .sequence_length = 4}},                                      \
-        {.type = AgitationMovementTypePause, .duration = 24},              \
+            {.type = AgitationMovementTypePause, .duration = 24},          \
     }
 
 //------------------------------------------------------------------------------
