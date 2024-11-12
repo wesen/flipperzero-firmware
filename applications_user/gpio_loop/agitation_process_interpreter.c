@@ -31,6 +31,10 @@ void agitation_process_interpreter_init(
     state->current_temperature = 20.0f; // Room temperature
     state->target_temperature = process->temperature;
 
+    // Initialize user interaction state
+    state->waiting_for_user = false;
+    state->user_message = NULL;
+
     DEBUG_PRINT("Process Interpreter Initialized:\n");
     DEBUG_PRINT("  Process Name: %s\n", process->process_name);
     DEBUG_PRINT("  Film Type: %s\n", process->film_type);
@@ -44,6 +48,11 @@ bool agitation_process_interpreter_tick(AgitationProcessInterpreterState* state)
         DEBUG_PRINT("Process Completed: All steps processed\n");
         state->process_state = AgitationProcessStateComplete;
         return false;
+    }
+
+    // If waiting for user, don't advance the process
+    if(state->waiting_for_user) {
+        return true;
     }
 
     // Get current step
@@ -77,6 +86,19 @@ bool agitation_process_interpreter_tick(AgitationProcessInterpreterState* state)
     // Tick the movement interpreter
     bool movement_active = agitation_interpreter_tick(&state->movement_interpreter);
 
+    // Check if we've hit a wait for user movement
+    if(movement_active && 
+       state->movement_interpreter.current_index < state->movement_interpreter.sequence_length) {
+        const AgitationMovementStatic* current_movement = 
+            &state->movement_interpreter.current_sequence[state->movement_interpreter.current_index];
+        
+        if(current_movement->type == AgitationMovementTypeWaitUser) {
+            state->waiting_for_user = true;
+            state->user_message = current_movement->message;
+            return true;
+        }
+    }
+
     // If movement is no longer active, move to next step
     if(!movement_active) {
         DEBUG_PRINT("Movement completed, moving to next step\n");
@@ -94,4 +116,13 @@ bool agitation_process_interpreter_tick(AgitationProcessInterpreterState* state)
 void agitation_process_interpreter_reset(AgitationProcessInterpreterState* state) {
     agitation_process_interpreter_init(
         state, state->process, state->motor_cw_callback, state->motor_ccw_callback);
+}
+
+void agitation_process_interpreter_confirm(AgitationProcessInterpreterState* state) {
+    if(state->waiting_for_user) {
+        state->waiting_for_user = false;
+        state->user_message = NULL;
+        // Advance past the wait movement
+        state->movement_interpreter.current_index++;
+    }
 }

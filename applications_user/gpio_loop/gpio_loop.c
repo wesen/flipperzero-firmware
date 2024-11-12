@@ -72,22 +72,35 @@ static void draw_callback(Canvas* canvas, void* context) {
     canvas_set_font(canvas, FontSecondary);
     canvas_draw_str(canvas, 2, 24, app->step_text);
 
-    // Draw status
-    canvas_draw_str(canvas, 2, 36, app->status_text);
+    // Draw status or user message
+    if(app->process_state.waiting_for_user) {
+        canvas_draw_str(canvas, 2, 36, app->process_state.user_message ? 
+                       app->process_state.user_message : "Press OK to continue");
+    } else {
+        canvas_draw_str(canvas, 2, 36, app->status_text);
+    }
 
-    // Draw movement state
-    canvas_draw_str(canvas, 2, 48, app->movement_text);
+    // Draw movement state if not waiting for user
+    if(!app->process_state.waiting_for_user) {
+        canvas_draw_str(canvas, 2, 48, app->movement_text);
+    }
 
-    // Draw pin states (remember these are active low)
+    // Draw pin states
     canvas_draw_str(canvas, 2, 60, "CW:");
     canvas_draw_str(canvas, 50, 60, !furi_hal_gpio_read(pin_cw) ? "ON" : "OFF");
 
     canvas_draw_str(canvas, 2, 70, "CCW:");
     canvas_draw_str(canvas, 50, 70, !furi_hal_gpio_read(pin_ccw) ? "ON" : "OFF");
 
-    // Draw control hints at the bottom
+    // Draw control hints
     if(app->process_active) {
-        elements_button_center(canvas, app->paused ? "Resume" : "Pause");
+        if(app->process_state.waiting_for_user) {
+            elements_button_center(canvas, "Continue");
+        } else if(app->paused) {
+            elements_button_center(canvas, "Resume");
+        } else {
+            elements_button_center(canvas, "Pause");
+        }
         elements_button_right(canvas, "Skip");
         elements_button_left(canvas, "Restart");
     } else {
@@ -178,20 +191,24 @@ static void input_callback(InputEvent* input_event, void* context) {
                     motor_ccw_callback);
                 app->process_active = true;
                 app->paused = false;
+            } else if(app->process_state.waiting_for_user) {
+                // Handle user confirmation
+                agitation_process_interpreter_confirm(&app->process_state);
             } else {
                 // Toggle pause
                 app->paused = !app->paused;
                 if(app->paused) {
-                    motor_stop(); // Stop motors while paused
+                    motor_stop();
                 }
             }
         } else if(app->process_active && input_event->key == InputKeyRight) {
-            // Skip to next step
-            motor_stop();
-            app->process_state.current_step_index++;
-            if(app->process_state.current_step_index >= app->current_process->steps_length) {
-                // End process if we've skipped past the last step
-                app->process_active = false;
+            // Skip to next step (only if not waiting for user)
+            if(!app->process_state.waiting_for_user) {
+                motor_stop();
+                app->process_state.current_step_index++;
+                if(app->process_state.current_step_index >= app->current_process->steps_length) {
+                    app->process_active = false;
+                }
             }
         } else if(app->process_active && input_event->key == InputKeyLeft) {
             // Restart current step

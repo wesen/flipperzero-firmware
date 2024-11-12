@@ -20,6 +20,7 @@ typedef enum {
     AgitationMovementTypeCCW = 1, // Counter-clockwise movement
     AgitationMovementTypePause = 2, // Pause/wait
     AgitationMovementTypeLoop = 3, // Repeating sequence
+    AgitationMovementTypeWaitUser = 4, // Wait for user interaction
 } AgitationMovementType;
 
 //------------------------------------------------------------------------------
@@ -40,11 +41,13 @@ struct AgitationMovementStatic {
         uint32_t duration;
         // For loops
         struct {
-            uint32_t count;        // 0 = use max_duration or infinite
+            uint32_t count; // 0 = use max_duration or infinite
             uint32_t max_duration; // 0 = use count or infinite
             const AgitationMovementStatic* sequence;
             size_t sequence_length;
         } loop;
+        // For user wait
+        const char* message; // Optional message to display
     };
 };
 

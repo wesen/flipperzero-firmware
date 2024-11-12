@@ -325,9 +325,13 @@ bool agitation_interpreter_tick(AgitationInterpreterState* state) {
                 current_movement->loop.max_duration);
             break;
 
+        case AgitationMovementTypeWaitUser:
+            // Wait for user continues to be handled by the UI layer
+            // Just stay on this movement until UI signals to continue
+            return true;
+
         default:
             DEBUG_PRINT("Unknown movement type, skipping\n");
-            // Unknown movement type, move to next
             state->current_index++;
             break;
         }

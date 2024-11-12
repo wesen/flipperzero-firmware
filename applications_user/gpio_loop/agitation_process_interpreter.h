@@ -30,6 +30,10 @@ typedef struct {
     // Callbacks for motor control
     void (*motor_cw_callback)(bool enable);
     void (*motor_ccw_callback)(bool enable);
+
+    // User interaction state
+    bool waiting_for_user;
+    const char* user_message;  // Points to current wait message if waiting_for_user is true
 } AgitationProcessInterpreterState;
 
 // Initialize process interpreter
@@ -48,4 +52,7 @@ bool agitation_process_interpreter_tick(
 // Reset process interpreter
 void agitation_process_interpreter_reset(
     AgitationProcessInterpreterState* state
-); 
+);
+
+// Add new function to handle user confirmation
+void agitation_process_interpreter_confirm(AgitationProcessInterpreterState* state); 
