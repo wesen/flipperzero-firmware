@@ -48,6 +48,8 @@ static void motor_cw_callback(bool enable) {
     }
 }
 
+// foobar
+
 static void motor_ccw_callback(bool enable) {
     if(enable) {
         // Safety check - ensure other motor is stopped first
@@ -74,8 +76,12 @@ static void draw_callback(Canvas* canvas, void* context) {
 
     // Draw status or user message
     if(app->process_state.waiting_for_user) {
-        canvas_draw_str(canvas, 2, 36, app->process_state.user_message ? 
-                       app->process_state.user_message : "Press OK to continue");
+        canvas_draw_str(
+            canvas,
+            2,
+            36,
+            app->process_state.user_message ? app->process_state.user_message :
+                                              "Press OK to continue");
     } else {
         canvas_draw_str(canvas, 2, 36, app->status_text);
     }
@@ -101,7 +107,7 @@ static void draw_callback(Canvas* canvas, void* context) {
         } else {
             elements_button_center(canvas, "Pause");
         }
-        elements_button_right(canvas, "Skip");
+        elements_button_right(canvas, "SkIP");
         elements_button_left(canvas, "Restart");
     } else {
         elements_button_center(canvas, "Start");
@@ -206,6 +212,7 @@ static void input_callback(InputEvent* input_event, void* context) {
             if(!app->process_state.waiting_for_user) {
                 motor_stop();
                 app->process_state.current_step_index++;
+                app->process_state.process_state = AgitationProcessStateIdle;
                 if(app->process_state.current_step_index >= app->current_process->steps_length) {
                     app->process_active = false;
                 }
@@ -271,6 +278,8 @@ int32_t gpio_loop_app(void* p) {
     snprintf(app->status_text, sizeof(app->status_text), "Press OK to start");
     snprintf(app->step_text, sizeof(app->step_text), "Ready");
     snprintf(app->movement_text, sizeof(app->movement_text), "Movement: Idle");
+
+    // furi_assert(false, "Hello");
 
     // Run event loop
     furi_event_loop_run(app->event_loop);
