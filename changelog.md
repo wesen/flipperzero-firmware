@@ -1,0 +1,273 @@
+# Context Documentation Enhancement
+
+Streamlined context descriptions in Flipper OS component scripts for clearer documentation.
+
+- Removed indirect language from context descriptions
+- Made all subsystem descriptions more direct and concise
+- Maintained clear linkage to Furi system documentation
+- Preserved functional subsystem organization
+
+# GUI Demo Application
+Added a simple GUI demo application that demonstrates basic Flipper Zero GUI concepts including:
+- ViewPort management
+- Canvas drawing primitives
+- Input handling
+- State management with mutex protection
+- Proper resource cleanup
+
+# HAL System Script Organization
+Created scripts to organize and query HAL system components for better documentation and analysis.
+
+- Created hal_core.sh for core hardware abstraction components
+- Created hal_usb.sh for USB and serial communication interfaces
+- Created hal_wireless.sh for wireless communication protocols
+- Created hal_power.sh for power management functionality
+- Created hal_storage.sh for storage and memory interfaces
+- Created hal_peripherals.sh for peripheral interfaces
+- Created hal_security.sh for security and crypto operations
+- Created hal_system.sh for system-level functionality
+- Created hal_io.sh for input/output functionality
+
+# HAL Debug Examples Organization
+Created scripts to demonstrate HAL functionality through debug applications.
+
+- Created core_examples.sh for core HAL usage demonstrations
+- Created usb_examples.sh for USB and serial interface examples
+- Created wireless_examples.sh for wireless protocol demos
+- Created power_examples.sh for power management examples
+- Created storage_examples.sh for storage operation demos
+- Created peripheral_examples.sh for peripheral interface tests
+- Created security_examples.sh for security feature examples
+- Created system_examples.sh for system functionality demos
+- Created io_examples.sh for input/output testing examples
+
+# GPIO Loop Application Updates
+
+## Enhanced Process Control
+Added new process control features:
+- Added pause/resume functionality with motor safety
+- Added step skip capability
+- Added current step restart option
+- Updated UI with button hints
+- Improved status display with pause indication
+
+## C41 Process Integration
+Added support for executing C41 film development process with visual feedback and motor control.
+- Implemented process interpreter integration
+- Added GUI with process status display
+- Added motor control via GPIO pins
+- Added temperature tracking display
+- Improved error handling and cleanup
+
+## Motor Control Safety Improvements
+Enhanced motor control safety and reliability:
+- Updated for active low pin operation
+- Added motor stop safety function
+- Prevented simultaneous motor activation
+- Added safety delays between motor switching
+- Improved motor state initialization and cleanup
+
+# Process Organization
+
+Split agitation processes into separate header files for better organization and maintainability:
+- Created common_sequences.h for shared sequence definitions
+- Separated B&W standard, stand development, continuous gentle, and C41 processes into individual files
+- Created main agitation_processes.h to include all process definitions
+
+# Duration-based Loop Support
+
+Added support for duration-based loops in the agitation DSL and interpreter to allow more flexible process timing control.
+
+- Added max_duration field to loop instructions
+- Updated DSL spec to document duration-based loops
+- Modified interpreter to track elapsed time in loops
+- Updated C41 process to use duration-based timing
+- Added duration tracking to loop stack entries
+
+# C++ Support Test
+
+Added C++ test files to verify C++ compilation support in the project.
+
+- Added motor_controller.hpp with a simple MotorController class
+- Added motor_controller.cpp as companion implementation file
+- Implemented singleton pattern for global motor controller access
+
+# UI Enhancement: Display Loop Duration and Remaining Time
+
+Updated the GPIO Loop UI to show timing information instead of temperature:
+- Shows elapsed/total time when in a loop with max duration
+- Shows elapsed time for continuous loops  
+- Shows remaining time for non-loop movements
+
+# C++ Refactor of Agitation Interpreter
+
+Refactored the agitation interpreter to C++ for better type safety and maintainability.
+
+- Converted agitation interpreter to C++ class
+- Added proper encapsulation of internal state
+- Improved type safety with enum class
+- Maintained embedded-friendly implementation (no STL, no dynamic allocation)
+
+# C++ Agitation Movement System Implementation
+
+Implemented the core movement system classes for the film developer agitation control:
+- Created base AgitationMovement class with concrete implementations
+- Implemented static MovementFactory for memory-constrained allocation
+- Added motor, pause, loop and wait user movement types
+- Designed for zero dynamic allocation and embedded constraints
+
+# Motor Controller C++ Implementation
+
+Implemented C++ MotorController class to manage film developer motor hardware:
+- Encapsulated GPIO pin control in RAII class
+- Added safety delays between motor direction changes
+- Maintained active-low pin logic from C implementation
+- Added running state tracking
+- Prevented object copying for hardware safety
+
+# Movement Loader Implementation
+
+Added MovementLoader class to convert static movement declarations to C++ movement objects:
+- Created static sequence loader with safety limits
+- Added support for nested loop sequences
+- Maintained zero dynamic allocation design
+- Added basic test coverage for C41 process
+- Modified MovementLoader to take MovementFactory as constructor parameter
+- Removed static methods and made them instance methods
+- Updated factory method calls to use injected factory instance
+
+# Refactor Film Developer Motor Control
+
+Replaced direct GPIO control with MotorController class for better encapsulation and safety
+
+- Removed dependency on io.c/io.h
+- Added motor controller instance to FilmDeveloperApp
+- Updated motor control callbacks to use MotorController
+- Added proper cleanup of motor controller resources
+
+# Add Debug Printing to Movement Classes
+
+Added print() method to AgitationMovement base class and all derived movement classes to help with debugging and monitoring movement execution.
+
+- Added virtual print() method to AgitationMovement base class
+- Implemented print() in MotorMovement to show direction and timing
+- Implemented print() in PauseMovement to show duration
+- Implemented print() in WaitUserMovement to show acknowledgment status
+- Implemented print() in LoopMovement to show iteration status and current movement
+
+# Enhanced Movement Debug Output
+
+Improved debug printing in LoopMovement to show full sequence context:
+- Added printing of entire movement sequence
+- Added visual indicator (>< brackets) for current movement in sequence
+- Maintained individual movement state printing
+
+# Add Debug Print Infrastructure
+
+Added debug printing infrastructure with conditional compilation:
+- Created debug.hpp with DEBUG_PRINT macro
+- Added NDEBUG-aware compilation to disable debug prints in release builds
+- Integrated with movement system debug printing
+
+# Add Host System Test Infrastructure
+
+Created test infrastructure to run and debug film developer code on host system:
+- Added test-film_developer directory with standalone test program
+- Created Makefile for host system compilation
+- Added mock MotorController implementation for testing
+- Implemented C41 process printing test
+
+# Enhanced Test Build System
+
+Improved Makefile for test environment:
+- Added automatic dependency tracking for header files
+- Included all film_developer source files in build
+- Maintained source directory structure in object files
+- Added film_developer to include paths
+
+# Add Host/Embedded Environment Support
+
+Added support for building and testing on host system:
+- Added HOST compilation flag to differentiate environments
+- Created host-specific MotorController interface
+- Added TestMotorController mock implementation
+- Updated Makefile to exclude embedded-only files
+- Added proper virtual destructor to MotorController
+- Fixed unused parameter warnings in test code
+
+# Enhanced Host System Support for Agitation Sequence
+
+Added comprehensive host system support to agitation sequence structures:
+- Created minimal FuriString implementation for host system
+- Added debug print methods to dynamic structures when building for host
+- Added string allocation/deallocation functions for host
+- Maintained full compatibility with embedded system
+- Added detailed structure printing for debugging
+
+# Fix Placement New Compilation Error
+
+Fixed compilation error in MovementFactory:
+- Added <new> header for placement new operator
+- Maintained zero dynamic allocation design
+- Fixed build for host system compilation
+
+# Add Movement Testing Infrastructure
+
+Enhanced test infrastructure with mock controller and improved test coverage:
+- Created MockController with state tracking and safety checks
+- Added detailed test output for sequence execution
+- Added motor state consistency checks
+- Added safety limits to prevent infinite loops
+- Improved test feedback with DEBUG_PRINT
+
+# Refactor Motor Controller for Better Abstraction
+
+Split motor controller into abstract base class and embedded implementation:
+- Created pure virtual MotorController base class
+- Moved embedded implementation to separate files
+- Added proper virtual destructor
+- Protected constructor to prevent direct instantiation
+- Maintained copy prevention for all derived classes
+- Separated GPIO handling into embedded-specific code
+
+# Improve Motor Controller Dependency Management
+
+Enhanced motor controller handling in interpreter and main app:
+- Made motor controller a dependency passed to interpreter
+- Removed motor controller ownership from interpreter
+- Added proper controller selection for host/embedded builds
+- Updated initialization to pass motor controller through
+- Fixed potential memory leaks in cleanup
+
+# Update Test Application for MovementLoader Changes
+Updated test application to use new MovementLoader dependency injection pattern.
+
+- Removed static MovementFactory::reset() call
+- Created MovementFactory instance
+- Created MovementLoader instance with factory dependency
+- Updated sequence loading to use loader instance
+- Added movement_loader.hpp include
+
+# Update Agitation Interpreter for MovementLoader Changes
+Modified agitation interpreter to use new MovementLoader dependency injection pattern.
+
+- Removed static MovementFactory::reset() call
+- Created local MovementFactory instance
+- Created MovementLoader instance with factory dependency
+- Updated sequence loading to use loader instance
+- Added movement_loader.hpp include
+
+# Memory Management Improvements in Movement System
+Improved memory safety by eliminating shared static data in movement sequences. Factory now properly allocates sequence storage from its pool.
+
+- Modified MovementFactory to allocate sequence storage from pool
+- Updated MovementLoader to take destination array parameter
+- Removed static sequence array from MovementLoader
+- Updated test application to use local sequence arrays
+
+# Update Agitation Interpreter for New Movement Loader API
+Updated agitation interpreter to use the new MovementLoader interface with explicit sequence storage.
+
+- Modified agitation_interpreter_init to allocate sequence storage
+- Updated sequence loading to use new three-parameter loadSequence API
+- Maintained static allocation for embedded constraints
