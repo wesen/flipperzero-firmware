@@ -390,3 +390,11 @@ Added detailed execution logging to all movement types for better debugging and 
 - Added execution logging to PauseMovement with progress
 - Added execution logging to LoopMovement with iteration and sequence position
 - Added execution logging to WaitUserMovement with state and elapsed time
+
+# Motor Direction Display
+
+Added direction display (CW/CCW) to the UI to better show motor movement state.
+
+- Added getDirectionString() method to MotorController interface
+- Implemented direction tracking in both mock and embedded controllers
+- Updated UI to show current movement direction

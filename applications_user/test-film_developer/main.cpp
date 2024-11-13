@@ -30,7 +30,7 @@ void print_process_state(const AgitationProcessInterpreter& interpreter) {
         interpreter.getState() == AgitationProcessState::Complete ? "Complete" :
         "Error");
     
-    DEBUG_PRINT("Step Index: %zu", interpreter.getCurrentStepIndex());
+    DEBUG_PRINT("Step Index: %lu/%lu", interpreter.getCurrentStepIndex() + 1, interpreter.getCurrentProcess()->steps_length);
     
     if (interpreter.isWaitingForUser()) {
         DEBUG_PRINT("Waiting for User: %s", interpreter.getUserMessage());
@@ -63,7 +63,7 @@ void run_c41_color_developer() {
     interpreter.init(&C41_FULL_PROCESS_STATIC, &motor);
 
     // Skip pre-wash to start at color developer
-    interpreter.skipToNextStep();
+    // interpreter.skipToNextStep();
 
     std::string input;
     int tick_count = 0;

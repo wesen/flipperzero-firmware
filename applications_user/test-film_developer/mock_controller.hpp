@@ -27,17 +27,24 @@ public:
     }
 
     // Additional test helper methods
-    bool isClockwise() const {
+    bool isClockwise() const override {
         return cw_active;
     }
-    bool isCounterClockwise() const {
+    bool isCounterClockwise() const override {
         return ccw_active;
     }
-    bool isStopped() const {
+    bool isStopped() const override {
         return !cw_active && !ccw_active;
     }
     bool isRunning() const override {
         return cw_active || ccw_active;
+    }
+
+    // Add new method to get direction
+    const char* getDirectionString() const override {
+        if (cw_active) return "CW";
+        if (ccw_active) return "CCW";
+        return "Idle";
     }
 
 private:
