@@ -157,10 +157,12 @@ Added print() method to AgitationMovement base class and all derived movement cl
 
 # Enhanced Movement Debug Output
 
-Improved debug printing in LoopMovement to show full sequence context:
-- Added printing of entire movement sequence
-- Added visual indicator (>< brackets) for current movement in sequence
-- Maintained individual movement state printing
+Improved movement debug printing with detailed timing information.
+
+- Added remaining time display to all timed movements
+- Added elapsed time display to all movements
+- Added total duration display where applicable
+- Improved formatting consistency across movement types
 
 # Add Debug Print Infrastructure
 
@@ -343,3 +345,48 @@ Enhanced movement factory with better memory safety checks and debugging capabil
 - Added pool usage statistics
 - Separated memory allocation from object construction
 - Added total size calculation for complex movements
+
+# Time Tracking and Step Control Improvements
+
+Added better time tracking and step control to improve user experience and code maintainability.
+
+- Added timeElapsed() and timeRemaining() methods to movement classes
+- Improved LoopMovement to track time across sequences
+- Added advanceToNextStep() helper to process interpreter
+- Updated status display to show elapsed/total time
+
+# Improved Duration Calculation for Loop Movements
+
+Enhanced time tracking for loop movements to better handle both duration-limited and iteration-based sequences.
+
+- Added getDuration() method to calculate total movement duration
+- Updated timeRemaining() to use getDuration() for more accurate calculations
+- Fixed duration calculation for nested sequences
+
+Enhanced Process Interpreter Information Display
+Added getCurrentStep and getCurrentMovement helper methods to provide more detailed information about the current state of film development process execution.
+- Added getCurrentStep() to get information about the current development step
+- Added getCurrentMovement() to get information about the current agitation movement
+- Enhanced test program to display more detailed process state information
+
+Enhanced Test Program Output
+Improved test program output with more detailed process execution information.
+- Added detailed step information display
+- Added process state tracking and display
+- Added movement timing progress information
+- Added percentage completion tracking
+- Improved formatting and organization of debug output
+
+Interactive Test Program
+Enhanced test program with interactive features for better debugging experience.
+- Added step-by-step execution with Enter key
+- Added screen clearing between ticks for cleaner output
+- Added quit option with 'q' key
+- Improved visual separation between execution states
+
+Enhanced Movement Execution Logging
+Added detailed execution logging to all movement types for better debugging and monitoring.
+- Added execution logging to MotorMovement with direction and progress
+- Added execution logging to PauseMovement with progress
+- Added execution logging to LoopMovement with iteration and sequence position
+- Added execution logging to WaitUserMovement with state and elapsed time
