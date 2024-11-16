@@ -2,266 +2,220 @@
 
 ## Overview
 
-The Number Input widget provides a user interface for entering and editing numeric values. It's particularly useful for:
+The Number Input widget provides a user interface for entering and editing integer values. It's particularly useful for:
 
-- Entering PIN codes
-- Setting numeric values
-- Inputting frequencies
-- Configuring numeric parameters
-- Creating number-based games
+- Setting numeric parameters
+- Entering PIN codes or frequencies
+- Configuring time or date values
+- Input validation with min/max bounds
 
 ## Prerequisites
 
 - Basic C programming knowledge
-- Flipper Zero firmware development environment set up
+- Flipper Zero firmware development environment
 - Understanding of basic GUI concepts
 
-## Step 1: Include Required Headers
+## Key Features
+
+1. Integer value input with min/max bounds
+2. Callback on value change
+3. Integration with ViewDispatcher
+4. Support for negative numbers
+5. Built-in validation
+
+## Basic Implementation
+
+### Header Inclusion
 
 ```c
 #include <gui/modules/number_input.h>
-#include <gui/view_dispatcher.h>
 ```
 
-## Step 2: Define Number Input Structure
+### Structure Definition
 
 ```c
 typedef struct {
-    NumberInput* number_input;
+    Gui* gui;
     ViewDispatcher* view_dispatcher;
-    // Add your application-specific state here
-    uint32_t result;
+    NumberInput* number_input;
+    int32_t result;
 } MyApp;
 
-// Callback for when the number input is completed
-static void number_input_callback(void* context) {
+// View IDs for ViewDispatcher
+typedef enum {
+    MyAppViewNumberInput,
+    // ... other views
+} MyAppView;
+```
+
+### Callback Definition
+
+```c
+static void number_input_callback(void* context, int32_t number) {
     MyApp* app = context;
+    app->result = number;
     // Handle the entered number
-    app->result = number_input_get_value(app->number_input);
-    // Switch back to previous view or handle the result
+    // For example, switch back to previous view:
+    view_dispatcher_switch_to_view(app->view_dispatcher, PreviousViewId);
 }
 ```
 
-## Step 3: Initialize the Number Input
+### Initialization
 
 ```c
 MyApp* app = malloc(sizeof(MyApp));
 
-// Allocate the number input
+// Initialize GUI and ViewDispatcher
+app->gui = furi_record_open(RECORD_GUI);
+app->view_dispatcher = view_dispatcher_alloc();
+view_dispatcher_enable_queue(app->view_dispatcher);
+view_dispatcher_attach_to_gui(app->view_dispatcher, app->gui, ViewDispatcherTypeFullscreen);
+
+// Initialize Number Input
 app->number_input = number_input_alloc();
 
-// Configure the number input
-number_input_set_header_text(app->number_input, "Enter Number");
+// Add view to ViewDispatcher
+view_dispatcher_add_view(
+    app->view_dispatcher,
+    MyAppViewNumberInput,
+    number_input_get_view(app->number_input));
 
-// Set input parameters
-number_input_set_min_max(app->number_input, 0, 9999);  // Set range
-number_input_set_step(app->number_input, 1);           // Set increment step
-number_input_set_value(app->number_input, 0);          // Set initial value
-
-// Set callback
-number_input_set_callback(
+// Configure Number Input
+number_input_set_result_callback(
     app->number_input,
-    number_input_callback,
-    app
-);
+    number_input_callback,  // Callback function
+    app,                   // Context
+    5,                     // Initial value
+    -100,                  // Minimum value
+    100,                   // Maximum value
+    "Enter Number",        // Header text
+    "Value");             // Unit text
 ```
 
-## Step 4: Integration with ViewDispatcher
+### Cleanup
 
 ```c
-View* view = number_input_get_view(app->number_input);
-view_dispatcher_add_view(view_dispatcher, MyNumberInputView, view);
+void my_app_free(MyApp* app) {
+    view_dispatcher_remove_view(app->view_dispatcher, MyAppViewNumberInput);
+    number_input_free(app->number_input);
+    view_dispatcher_free(app->view_dispatcher);
+    furi_record_close(RECORD_GUI);
+    free(app);
+}
 ```
 
 ## Example Application
 
-Here's a complete example that creates a frequency input:
+Here's a complete example that creates a number input for setting a frequency:
 
 ```c
+#include <furi.h>
+#include <gui/gui.h>
+#include <gui/view_dispatcher.h>
+#include <gui/modules/number_input.h>
+
 typedef struct {
-    NumberInput* number_input;
+    Gui* gui;
     ViewDispatcher* view_dispatcher;
-    uint32_t frequency;
+    NumberInput* number_input;
+    int32_t frequency;
 } FrequencyApp;
 
-static void frequency_input_callback(void* context) {
+typedef enum {
+    FrequencyViewNumberInput,
+} FrequencyView;
+
+static void frequency_input_callback(void* context, int32_t number) {
     FrequencyApp* app = context;
-    app->frequency = number_input_get_value(app->number_input);
-    FURI_LOG_I("Frequency", "Set to: %lu Hz", app->frequency);
+    app->frequency = number;
+    FURI_LOG_I("Frequency", "Set to: %ld Hz", app->frequency);
+}
+
+static bool frequency_input_back_event(void* context) {
+    UNUSED(context);
+    return false;  // Allow default back behavior
+}
+
+FrequencyApp* frequency_app_alloc() {
+    FrequencyApp* app = malloc(sizeof(FrequencyApp));
     
-    // Here you would typically handle the frequency value
-    // For example, configure a radio module or save the setting
+    // GUI
+    app->gui = furi_record_open(RECORD_GUI);
+    
+    // View Dispatcher
+    app->view_dispatcher = view_dispatcher_alloc();
+    view_dispatcher_attach_to_gui(app->view_dispatcher, app->gui, ViewDispatcherTypeFullscreen);
+    
+    // Number Input
+    app->number_input = number_input_alloc();
+    view_dispatcher_add_view(
+        app->view_dispatcher,
+        FrequencyViewNumberInput,
+        number_input_get_view(app->number_input));
+    
+    // Configure Number Input
+    number_input_set_result_callback(
+        app->number_input,
+        frequency_input_callback,
+        app,
+        433920000,  // Default 433.92 MHz
+        300000000,  // Min 300 MHz
+        900000000,  // Max 900 MHz
+        "Enter Frequency",
+        "Hz");
+    
+    view_set_previous_callback(
+        number_input_get_view(app->number_input),
+        frequency_input_back_event);
+    
+    return app;
+}
+
+void frequency_app_free(FrequencyApp* app) {
+    view_dispatcher_remove_view(app->view_dispatcher, FrequencyViewNumberInput);
+    number_input_free(app->number_input);
+    view_dispatcher_free(app->view_dispatcher);
+    furi_record_close(RECORD_GUI);
+    free(app);
 }
 
 int32_t frequency_app(void* p) {
     UNUSED(p);
-    FrequencyApp* app = malloc(sizeof(FrequencyApp));
-
-    // Allocate view dispatcher
-    app->view_dispatcher = view_dispatcher_alloc();
+    FrequencyApp* app = frequency_app_alloc();
     
-    // Allocate number input
-    app->number_input = number_input_alloc();
-    
-    // Configure number input
-    number_input_set_header_text(app->number_input, "Frequency (Hz)");
-    number_input_set_min_max(app->number_input, 1, 999999);  // 1 Hz to 999.999 kHz
-    number_input_set_step(app->number_input, 1000);          // 1 kHz steps
-    number_input_set_value(app->number_input, 433920);       // Default to 433.92 MHz
-    
-    // Set callback
-    number_input_set_callback(app->number_input, frequency_input_callback, app);
-    
-    // Get view and add to dispatcher
-    View* view = number_input_get_view(app->number_input);
-    view_dispatcher_add_view(app->view_dispatcher, 0, view);
-    view_dispatcher_switch_to_view(app->view_dispatcher, 0);
-    
-    // Run dispatcher
+    view_dispatcher_switch_to_view(app->view_dispatcher, FrequencyViewNumberInput);
     view_dispatcher_run(app->view_dispatcher);
     
-    // Cleanup
-    view_dispatcher_remove_view(app->view_dispatcher, 0);
-    number_input_free(app->number_input);
-    view_dispatcher_free(app->view_dispatcher);
-    free(app);
-    
+    frequency_app_free(app);
     return 0;
 }
 ```
 
-## Key Features
-
-- Configurable numeric range
-- Adjustable step size
-- Header text customization
-- Callback support
-- Value validation
-- Up/Down navigation
-- Direct number entry
-
-## Common Customization Options
-
-1. **Set Range:**
-```c
-number_input_set_min_max(number_input, min_value, max_value);
-```
-
-2. **Set Step Size:**
-```c
-number_input_set_step(number_input, step_value);
-```
-
-3. **Set Header Text:**
-```c
-number_input_set_header_text(number_input, "Enter Value");
-```
-
-4. **Set Initial Value:**
-```c
-number_input_set_value(number_input, initial_value);
-```
-
 ## Best Practices
 
-1. Set appropriate min/max ranges
-2. Use logical step sizes
-3. Provide clear header text
-4. Handle all input callbacks
-5. Validate input values
-6. Clean up resources when done
-7. Consider user input constraints
+1. Always set min/max values to prevent invalid input
+2. Provide clear header and unit text for context
+3. Handle the back event appropriately
+4. Free resources in the correct order
+5. Use meaningful variable names and comments
 
 ## Common Use Cases
 
-1. **PIN Entry:**
-```c
-// Configure for 4-digit PIN
-number_input_set_min_max(number_input, 0, 9999);
-number_input_set_step(number_input, 1);
-number_input_set_header_text(number_input, "Enter PIN");
-```
+1. **Frequency Input**: Setting radio frequencies with Hz units
+2. **Time Settings**: Entering minutes or seconds for timers
+3. **PIN Entry**: Secure number input with masked display
+4. **Configuration**: Setting parameters with numeric bounds
 
-2. **Frequency Input:**
-```c
-// Configure for frequency in kHz
-number_input_set_min_max(number_input, 1, 999999);
-number_input_set_step(number_input, 1000);
-number_input_set_header_text(number_input, "Frequency (kHz)");
-```
+## Advanced Features
 
-3. **Value Selector:**
-```c
-// Configure for selecting a value from 1-100
-number_input_set_min_max(number_input, 1, 100);
-number_input_set_step(number_input, 1);
-number_input_set_header_text(number_input, "Select Value");
-```
+1. **Custom Validation**: Add additional validation in the callback
+2. **Dynamic Bounds**: Change min/max values based on context
+3. **Unit Display**: Show appropriate units for the value
+4. **State Management**: Save/restore input state
 
-## Common Issues and Solutions
+## Troubleshooting
 
-1. **Value out of range:**
-   - Verify min/max settings
-   - Check step size
-   - Ensure initial value is within range
-
-2. **Step size issues:**
-   - Verify step size is appropriate for range
-   - Check if step size divides evenly into range
-   - Consider user input requirements
-
-3. **Callback not firing:**
-   - Verify callback is properly set
-   - Check context pointer
-   - Ensure view is properly added to dispatcher
-
-## Exercises
-
-1. Create a PIN entry system
-2. Build a frequency selector
-3. Implement a game score input
-4. Create a temperature setting interface
-5. Build a time input (hours/minutes)
-
-## Advanced Usage
-
-1. **Custom Value Formatting:**
-```c
-static void format_value(NumberInput* input, uint32_t value) {
-    char str[32];
-    snprintf(str, sizeof(str), "%lu.%lu MHz", value / 1000, value % 1000);
-    number_input_set_header_text(input, str);
-}
-```
-
-2. **Range Validation:**
-```c
-static bool validate_frequency(uint32_t freq) {
-    // Check if frequency is within valid bands
-    return (freq >= 433000 && freq <= 434000) ||
-           (freq >= 868000 && freq <= 869000);
-}
-```
-
-3. **Step Size Adjustment:**
-```c
-static void adjust_step_size(NumberInput* input, uint32_t value) {
-    if(value < 1000) {
-        number_input_set_step(input, 1);        // 1 Hz steps
-    } else if(value < 10000) {
-        number_input_set_step(input, 10);       // 10 Hz steps
-    } else {
-        number_input_set_step(input, 1000);     // 1 kHz steps
-    }
-}
-```
-
-## Tips for Better User Experience
-
-1. Use appropriate step sizes for the value range
-2. Provide clear feedback through header text
-3. Consider adding unit labels
-4. Implement value validation
-5. Use sensible default values
-6. Add range indicators in header
-7. Consider user input speed vs precision
+1. **Input Not Showing**: Ensure view is added to ViewDispatcher
+2. **Callback Not Firing**: Check callback registration
+3. **Value Out of Bounds**: Verify min/max settings
+4. **Memory Leaks**: Confirm proper cleanup sequence

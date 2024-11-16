@@ -17,6 +17,21 @@ The Submenu widget provides a vertical list-based menu interface with optional h
 4. Built-in scrollbar for navigation
 5. Highlight-based selection
 6. Dynamic item management (add/modify/reset)
+7. Built-in back navigation through exit callback
+
+## Navigation Handling
+
+The submenu widget automatically handles back navigation through its exit callback. You do not need to implement a separate back button callback. Simply set up the exit callback to return the view you want to switch to when the back button is pressed:
+
+```c
+static uint32_t submenu_exit_callback(void* context) {
+    UNUSED(context);
+    return PreviousViewId;  // Return the view to switch to
+}
+
+// Set the callback
+view_set_previous_callback(submenu_get_view(app->submenu), submenu_exit_callback);
+```
 
 ## Basic Implementation
 
@@ -419,4 +434,3 @@ static void main_menu_callback(void* context, uint32_t index) {
             SettingsMenuViewId);
     }
 }
-```
