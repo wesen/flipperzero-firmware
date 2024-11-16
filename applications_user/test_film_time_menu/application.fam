@@ -1,0 +1,11 @@
+App(
+    appid="test_film_time_menu",
+    name="Film Time Settings",
+    apptype=FlipperAppType.EXTERNAL,
+    entry_point="film_time_app",
+    stack_size=1 * 1024,
+    fap_category="Tools",
+    fap_author="Flipper Devices",
+    fap_version="1.0",
+    fap_description="Film development time calculator for Ilford B&W process",
+)
