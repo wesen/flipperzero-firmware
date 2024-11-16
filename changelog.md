@@ -404,3 +404,12 @@ Added comprehensive tutorial on creating multi-scene applications using Scene Ma
 - Created TUTORIAL.md with detailed explanations and code examples
 - Covers scene setup, navigation, event handling and best practices
 - Uses Timer app as practical example
+
+# Film Photography Menu Demo App
+
+Added a new demo application that shows how to implement nested submenus for selecting photography film and developer types. The app demonstrates proper view management, callback handling, and state management using the submenu widget.
+
+- Created test_menu_film application with three submenu views
+- Implemented film type selection submenu
+- Implemented developer selection submenu
+- Added state tracking for selections
