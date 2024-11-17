@@ -11,7 +11,7 @@ bool scene_manager_01_tutorial_scene_circle_on_event(void* context, SceneManager
     bool consumed = false;
 
     if(event.type == SceneManagerEventTypeBack) {
-        scene_manager_next_scene(app->scene_manager, SceneManager01TutorialSceneMain);
+        scene_manager_search_and_switch_to_another_scene(app->scene_manager, SceneManager01TutorialSceneMain);
         consumed = true;
     }
 

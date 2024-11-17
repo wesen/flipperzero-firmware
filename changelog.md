@@ -415,3 +415,11 @@ Added a new demo application that shows how to implement nested submenus for sel
 - Implemented film type selection submenu
 - Implemented developer selection submenu
 - Added state tracking for selections
+
+# Add Warning Modal Scene
+
+Added a warning modal scene to demonstrate modal dialog implementation:
+- Created warning view with custom frame and text
+- Added scene handling for warning modal
+- Updated main scene to trigger warning on OK button
+- Added proper navigation between scenes

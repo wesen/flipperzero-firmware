@@ -32,6 +32,10 @@ int32_t scene_manager_01_tutorial(void* p) {
     view_dispatcher_add_view(
         app->view_dispatcher, SceneManager01TutorialViewCircle, app->circle_view);
 
+    app->warning_view = scene_manager_01_tutorial_warning_view_alloc(app);
+    view_dispatcher_add_view(
+        app->view_dispatcher, SceneManager01TutorialViewWarning, app->warning_view);
+
     // Configure view dispatcher
     view_dispatcher_set_event_callback_context(app->view_dispatcher, app);
     view_dispatcher_set_custom_event_callback(
@@ -49,9 +53,11 @@ int32_t scene_manager_01_tutorial(void* p) {
     // Cleanup
     view_dispatcher_remove_view(app->view_dispatcher, SceneManager01TutorialViewMain);
     view_dispatcher_remove_view(app->view_dispatcher, SceneManager01TutorialViewCircle);
+    view_dispatcher_remove_view(app->view_dispatcher, SceneManager01TutorialViewWarning);
 
     scene_manager_01_tutorial_main_view_free(app->main_view);
     scene_manager_01_tutorial_circle_view_free(app->circle_view);
+    scene_manager_01_tutorial_warning_view_free(app->warning_view);
 
     scene_manager_free(app->scene_manager);
     view_dispatcher_free(app->view_dispatcher);

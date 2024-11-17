@@ -1,16 +1,19 @@
 > https://claude.ai/chat/66585e10-783b-4d04-88fe-a18cd5f06d61
 
 # Scene Manager Technical Documentation
+
 ## For Flipper Zero Application Development
 
 ### Document Planning
 
 #### Audience Analysis
+
 - Primary: Flipper Zero application developers
 - Expected Knowledge: C programming, basic GUI concepts
 - Technical Level: Intermediate to Advanced
 
 #### Key Components
+
 1. Scene Management Architecture
 2. Scene Lifecycle
 3. Navigation and State Management
@@ -97,7 +100,7 @@ void scene_main_on_enter(void* context) {
 bool scene_main_on_event(void* context, SceneManagerEvent event) {
     MyApp* app = context;
     bool consumed = false;
-    
+
     if(event.type == SceneManagerEventTypeCustom) {
         switch(event.event) {
             case MyCustomEventOpenSettings:
@@ -106,7 +109,7 @@ bool scene_main_on_event(void* context, SceneManagerEvent event) {
                 break;
         }
     }
-    
+
     return consumed;
 }
 
@@ -122,20 +125,65 @@ void scene_main_on_exit(void* context) {
 
 The Scene Manager provides several methods for navigation:
 
-1. **Forward Navigation**:
-```c
-scene_manager_next_scene(scene_manager, next_scene_id);
-```
+1. **Basic Navigation**
 
-2. **Back Navigation**:
-```c
-scene_manager_previous_scene(scene_manager);
-```
+- `scene_manager_next_scene(SceneManager*, uint32_t next_scene_id)`
 
-3. **Direct Navigation**:
-```c
-scene_manager_search_and_switch_to_another_scene(scene_manager, target_scene_id);
-```
+  - Pushes new scene onto stack
+  - Calls `on_exit` for current scene
+  - Calls `on_enter` for new scene
+  - Used for forward navigation
+
+- `scene_manager_previous_scene(SceneManager*)`
+  - Pops current scene from stack
+  - Calls `on_exit` for current scene
+  - Calls `on_enter` for previous scene
+  - Returns false if stack is empty
+  - Used for basic back navigation
+
+2. **Advanced Navigation**
+
+- `scene_manager_search_and_switch_to_previous_scene(SceneManager*, uint32_t scene_id)`
+
+  - Searches backward in stack for specific scene ID
+  - If found:
+    - Removes all scenes after found scene
+    - Calls `on_exit` for current scene
+    - Calls `on_enter` for found scene
+  - Returns false if scene not found
+  - Used for jumping back to specific previous scene
+
+- `scene_manager_search_and_switch_to_previous_scene_one_of(SceneManager*, const uint32_t* scene_ids, size_t scene_ids_size)`
+
+  - Takes array of scene IDs
+  - Searches for first matching scene ID in stack
+  - If found:
+    - Uses `search_and_switch_to_previous_scene` to navigate
+  - Returns false if no matching scenes found
+  - Used for jumping back to one of several possible scenes
+
+- `scene_manager_search_and_switch_to_another_scene(SceneManager*, uint32_t scene_id)`
+  - Clears stack except first scene
+  - Pushes new scene onto stack
+  - Calls `on_exit` for current scene
+  - Calls `on_enter` for new scene
+  - Returns false if stack is empty
+  - Used for resetting navigation to specific scene
+
+3. **Helper Functions**
+
+- `scene_manager_has_previous_scene(const SceneManager*, uint32_t scene_id)`
+  - Searches backward in stack for specific scene ID
+  - Returns true if scene is found in history
+  - Does not modify navigation state
+  - Used to check if scene exists in history
+
+4. **Cleanup**
+
+- `scene_manager_stop(SceneManager*)`
+  - Calls `on_exit` for current scene if exists
+  - Does not modify stack
+  - Used for cleanup when shutting down
 
 #### 4.2 State Management
 
@@ -166,25 +214,25 @@ Events are processed through the scene's `on_event` handler:
 ```c
 bool scene_on_event(void* context, SceneManagerEvent event) {
     bool consumed = false;
-    
+
     switch(event.type) {
         case SceneManagerEventTypeCustom:
             // Handle custom events
             break;
-            
+
         case SceneManagerEventTypeBack:
             // Handle back navigation
             consumed = scene_manager_search_and_switch_to_previous_scene(
-                scene_manager, 
+                scene_manager,
                 previous_scene_id
             );
             break;
-            
+
         case SceneManagerEventTypeTick:
             // Handle periodic updates
             break;
     }
-    
+
     return consumed;
 }
 ```
@@ -218,10 +266,10 @@ void show_modal_dialog(MyApp* app) {
         app->scene_manager,
         current_scene_id
     );
-    
+
     // Switch to dialog scene
     scene_manager_next_scene(app->scene_manager, MyAppSceneDialog);
-    
+
     // Pass previous state to dialog
     scene_manager_set_scene_state(
         app->scene_manager,
@@ -255,8 +303,8 @@ void next_scene_on_enter(void* context) {
 1. **Memory Leaks**
    - Symptom: Growing memory usage
    - Solution: Ensure proper cleanup in `on_exit` handlers
-   
 2. **Navigation Loops**
+
    - Symptom: Infinite scene transitions
    - Solution: Implement proper navigation validation
 

@@ -13,6 +13,11 @@ bool scene_manager_01_tutorial_scene_main_on_event(void* context, SceneManagerEv
     if(event.type == SceneManagerEventTypeBack) {
         scene_manager_next_scene(app->scene_manager, SceneManager01TutorialSceneCircle);
         consumed = true;
+    } else if(event.type == SceneManagerEventTypeCustom) {
+        if(event.event == InputKeyOk) {
+            scene_manager_next_scene(app->scene_manager, SceneManager01TutorialSceneWarning);
+            consumed = true;
+        }
     }
 
     return consumed;

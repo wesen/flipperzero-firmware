@@ -11,10 +11,12 @@ typedef struct SceneManager01Tutorial {
     SceneManager* scene_manager;
     View* main_view;
     View* circle_view;
+    View* warning_view;
 } SceneManager01Tutorial;
 
 typedef enum {
     SceneManager01TutorialViewMain,
     SceneManager01TutorialViewCircle,
+    SceneManager01TutorialViewWarning,
     SceneManager01TutorialViewCount,
 } SceneManager01TutorialView; 
