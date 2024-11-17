@@ -399,11 +399,13 @@ Added direction display (CW/CCW) to the UI to better show motor movement state.
 - Implemented direction tracking in both mock and embedded controllers
 - Updated UI to show current movement direction
 
-# Scene Manager Tutorial
-Added comprehensive tutorial on creating multi-scene applications using Scene Manager
-- Created TUTORIAL.md with detailed explanations and code examples
-- Covers scene setup, navigation, event handling and best practices
-- Uses Timer app as practical example
+# Scene Manager Tutorial Refactor
+
+Refactored the Scene Manager tutorial to follow the recommended pattern with:
+- Separated views into their own files
+- Proper scene configuration using macros
+- Better organized scene management
+- Cleaner code structure following Flipper Zero conventions
 
 # Film Photography Menu Demo App
 

@@ -152,6 +152,101 @@ extern const SceneManagerHandlers device_info_scene_handlers;
 SceneManager* scene_manager;
 ```
 
+### Scene Handlers Configuration
+
+Here's how to properly initialize scene handlers based on the example BLE beacon application.
+
+1. First, create a scene configuration header (`scene_config.h`):
+
+```c:scene_config.h
+ADD_SCENE(device_info, main, Main)
+ADD_SCENE(device_info, details, Details)
+ADD_SCENE(device_info, system, System)
+```
+
+2. Create a scenes header (`scenes.h`):
+
+```c:scenes.h
+#pragma once
+
+#include <gui/scene_manager.h>
+
+// Generate scene id and total number
+#define ADD_SCENE(prefix, name, id) DeviceInfoScene##id,
+typedef enum {
+#include "scene_config.h"
+    DeviceInfoSceneNum,
+} DeviceInfoScene;
+#undef ADD_SCENE
+
+extern const SceneManagerHandlers device_info_scene_handlers;
+
+// Generate scene on_enter handlers declaration
+#define ADD_SCENE(prefix, name, id) void prefix##_scene_##name##_on_enter(void*);
+#include "scene_config.h"
+#undef ADD_SCENE
+
+// Generate scene on_event handlers declaration
+#define ADD_SCENE(prefix, name, id) \
+    bool prefix##_scene_##name##_on_event(void* context, SceneManagerEvent event);
+#include "scene_config.h"
+#undef ADD_SCENE
+
+// Generate scene on_exit handlers declaration
+#define ADD_SCENE(prefix, name, id) void prefix##_scene_##name##_on_exit(void* context);
+#include "scene_config.h"
+#undef ADD_SCENE
+```
+
+3. Create a scenes implementation file (`scenes.c`):
+
+```c:scenes.c
+#include "scenes.h"
+
+// Generate scene on_enter handlers array
+#define ADD_SCENE(prefix, name, id) prefix##_scene_##name##_on_enter,
+void (*const device_info_on_enter_handlers[])(void*) = {
+#include "scene_config.h"
+};
+#undef ADD_SCENE
+
+// Generate scene on_event handlers array
+#define ADD_SCENE(prefix, name, id) prefix##_scene_##name##_on_event,
+bool (*const device_info_on_event_handlers[])(void* context, SceneManagerEvent event) = {
+#include "scene_config.h"
+};
+#undef ADD_SCENE
+
+// Generate scene on_exit handlers array
+#define ADD_SCENE(prefix, name, id) prefix##_scene_##name##_on_exit,
+void (*const device_info_on_exit_handlers[])(void* context) = {
+#include "scene_config.h"
+};
+#undef ADD_SCENE
+
+// Initialize scene handlers configuration structure
+const SceneManagerHandlers device_info_scene_handlers = {
+    .on_enter_handlers = device_info_on_enter_handlers,
+    .on_event_handlers = device_info_on_event_handlers,
+    .on_exit_handlers = device_info_on_exit_handlers,
+    .scene_num = DeviceInfoSceneNum,
+};
+```
+
+4. In your main application initialization, set up the scene manager:
+
+```c
+// In your app allocation function
+app->scene_manager = scene_manager_alloc(&device_info_scene_handlers, app);
+```
+
+The key benefits of this approach are:
+
+1. **Automatic Handler Generation**: The macros automatically generate all necessary handler arrays
+2. **Type Safety**: Scene IDs are generated as an enum
+3. **Maintainability**: Adding a new scene only requires adding one line to `scene_config.h`
+4. **Consistency**: All scene handlers follow the same pattern
+
 ### Key Concepts Explained:
 
 1. **Scenes**: Represent different screens or states in the app
