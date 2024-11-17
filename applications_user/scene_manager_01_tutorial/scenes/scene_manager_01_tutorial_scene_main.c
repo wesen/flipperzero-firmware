@@ -11,11 +11,15 @@ bool scene_manager_01_tutorial_scene_main_on_event(void* context, SceneManagerEv
     bool consumed = false;
 
     if(event.type == SceneManagerEventTypeBack) {
-        scene_manager_next_scene(app->scene_manager, SceneManager01TutorialSceneCircle);
+        scene_manager_search_and_switch_to_another_scene(
+            app->scene_manager, SceneManager01TutorialSceneCircle);
         consumed = true;
     } else if(event.type == SceneManagerEventTypeCustom) {
-        if(event.event == InputKeyOk) {
+        if(event.event == SceneManager01TutorialEventOpenWarningScene) {
             scene_manager_next_scene(app->scene_manager, SceneManager01TutorialSceneWarning);
+            consumed = true;
+        } else if(event.event == SceneManager01TutorialEventOpenInfoScene) {
+            scene_manager_next_scene(app->scene_manager, SceneManager01TutorialSceneDolphinInfo);
             consumed = true;
         }
     }

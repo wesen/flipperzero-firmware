@@ -2,6 +2,12 @@
 
 #include <gui/scene_manager.h>
 
+// Custom events for Scene Manager 01 Tutorial
+typedef enum {
+    SceneManager01TutorialEventOpenWarningScene,
+    SceneManager01TutorialEventOpenInfoScene,
+} SceneManager01TutorialEvent;
+
 // Generate scene id and total number
 #define ADD_SCENE(prefix, name, id) SceneManager01TutorialScene##id,
 typedef enum {
