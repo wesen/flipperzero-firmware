@@ -1,0 +1,18 @@
+App(
+    appid="tutorial_event_loop",
+    name="Tutorial Event Loop",
+    apptype=FlipperAppType.EXTERNAL,
+    entry_point="tutorial_event_loop_app",
+    cdefines=["TUTORIAL_EVENT_LOOP_APP"],
+    requires=[
+        "gui",
+    ],
+    stack_size=2 * 1024,
+    order=100,
+    fap_description="Tutorial Event Loop",
+    fap_author="codeallnight",
+    fap_weburl="https://github.com/jamisonderek/Flipper-Zero-tutorials",
+    fap_category="UI",
+    fap_icon="icon.png",
+    fap_libs=["assets"],
+)

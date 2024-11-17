@@ -1,0 +1,9 @@
+App(
+    appid="scene_manager_01_tutorial",
+    name="Scene Manager 01 Tutorial",
+    apptype=FlipperAppType.EXTERNAL,
+    entry_point="scene_manager_01_tutorial",
+    requires=["gui"],
+    stack_size=1 * 1024,
+    fap_category="Examples",
+)
