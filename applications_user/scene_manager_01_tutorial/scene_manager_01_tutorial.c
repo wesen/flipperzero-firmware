@@ -13,9 +13,83 @@ typedef struct {
     int y;
 } ViewState;
 
-static void view_draw_callback(Canvas* canvas, void* context) {
-    ViewState* state = context;
+static void view_draw_callback(Canvas* canvas, void* model) {
+    ViewState* state = model;
     canvas_draw_str(canvas, state->x, state->y, "Hello Flipper!");
+    // canvas_draw_str_aligned(canvas, 10, 10, AlignLeft, AlignTop, "Aligned Flipper!");
+    // canvas_draw_str_aligned(canvas, 50, 20, AlignRight, AlignBottom, "Bottom Flipper!");
+    canvas_draw_box(canvas, 10, 10, 10, 10);
+    canvas_draw_rbox(canvas, 40, 30, 10, 10, 5);
+    canvas_draw_frame(canvas, 70, 20, 20, 20);
+}
+
+static bool view_input_callback(InputEvent* event, void* context) {
+    SceneManager01Tutorial* app = context;
+    bool handled = false;
+
+    if(event->type == InputTypeShort) {
+        with_view_model(
+            app->main_view,
+            ViewState * model,
+            {
+                switch(event->key) {
+                case InputKeyUp:
+                    model->y -= 2;
+                    handled = true;
+                    break;
+                case InputKeyDown:
+                    model->y += 2;
+                    handled = true;
+                    break;
+                case InputKeyRight:
+                    model->x += 2;
+                    handled = true;
+                    break;
+                case InputKeyLeft:
+                    model->x -= 2;
+                    handled = true;
+                    break;
+                case InputKeyOk:
+                case InputKeyBack:
+                    break;
+                case InputKeyMAX:
+                    break;
+                }
+            },
+            handled);
+    } else if (event->type == InputTypeLong) {
+        with_view_model(
+            app->main_view,
+            ViewState * model,
+            {
+                switch(event->key) {
+                case InputKeyUp:
+                    model->y -= 10;
+                    handled = true;
+                    break;
+                case InputKeyDown:
+                    model->y += 10;
+                    handled = true;
+                    break;
+                case InputKeyRight:
+                    model->x += 10;
+                    handled = true;
+                    break;
+                case InputKeyLeft:
+                    model->x -= 10;
+                    handled = true;
+                    break;
+                case InputKeyOk:
+                case InputKeyBack:
+                    break;
+                case InputKeyMAX:
+                    break;
+                }
+            },
+            handled);
+    }
+
+    return handled;
 }
 
 int32_t scene_manager_01_tutorial(void*) {
@@ -36,6 +110,7 @@ int32_t scene_manager_01_tutorial(void*) {
         true);
     view_set_context(app->main_view, app);
     view_set_draw_callback(app->main_view, view_draw_callback);
+    view_set_input_callback(app->main_view, view_input_callback);
 
     view_dispatcher_add_view(app->view_dispatcher, 0, app->main_view);
     view_dispatcher_attach_to_gui(app->view_dispatcher, app->gui, ViewDispatcherTypeFullscreen);

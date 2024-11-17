@@ -90,12 +90,12 @@ Let's make our app interactive by responding to button presses.
 
 ```c
 static bool view_input_callback(InputEvent* event, void* context) {
-    View* view = context;
+    DeviceInfoApp* app = context;
     bool handled = false;
 
     if(event->type == InputTypeShort) {
         with_view_model(
-            view,
+            app->main_view,  // Get view from app context
             MainViewModel* model,
             {
                 switch(event->key) {
