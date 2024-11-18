@@ -89,14 +89,20 @@ static void time_edit_callback(VariableItem* item) {
     FilmStep* step = &app->steps[app->selected_step];
 
     // Configure time input for the current step
+    char header[32];
+    snprintf(header, sizeof(header), "Set %s Time", step_names[step->step_index]);
+    number_input_set_header_text(app->time_input, header);
+
+    // Configure number input
     number_input_set_result_callback(
         app->time_input,
         time_input_callback,
         app,
-        (int32_t)step->base_time, // Current time as initial value
-        1, // Min 1 minute
-        60, // Max 60 minutes
+        (int32_t)step->base_time,
+        1,  // Min 1 minute
+        60  // Max 60 minutes
     );
+
     view_dispatcher_switch_to_view(app->view_dispatcher, FilmTimeViewTimeInput);
 }
 
@@ -119,6 +125,23 @@ static void step_enter_callback(void* context, uint32_t index) {
     UNUSED(index);
     FilmTimeApp* app = context;
     film_time_calculate_final_time(&app->steps[app->selected_step]);
+}
+
+static void init_step_menu(FilmTimeApp* app) {
+    // Add push/pull control
+    VariableItem* item =
+        variable_item_list_add(app->step_menu, "Push/Pull", 7, push_pull_changed, app);
+    variable_item_set_current_value_index(item, 3); // Default to 0
+    variable_item_set_current_value_text(item, "0");
+
+    // Add scale control
+    item = variable_item_list_add(app->step_menu, "Scale", 101, scale_changed, app); // 50% to 150%
+    variable_item_set_current_value_index(item, 50); // Default to 100%
+    variable_item_set_current_value_text(item, "100%");
+
+    // Add time edit item
+    item = variable_item_list_add(app->step_menu, "Edit Time", 1, time_edit_callback, app);
+    variable_item_set_current_value_text(item, "Press OK");
 }
 
 FilmTimeApp* film_time_app_alloc() {
@@ -151,29 +174,18 @@ FilmTimeApp* film_time_app_alloc() {
         app->view_dispatcher, FilmTimeViewTimeInput, number_input_get_view(app->time_input));
     view_set_previous_callback(number_input_get_view(app->time_input), time_input_exit_callback);
 
-    // Add push/pull control
-    VariableItem* item =
-        variable_item_list_add(app->step_menu, "Push/Pull", 7, push_pull_changed, app);
-    variable_item_set_current_value_index(item, 3); // Default to 0
-    variable_item_set_current_value_text(item, "0");
-
-    // Add scale control
-    item = variable_item_list_add(app->step_menu, "Scale", 101, scale_changed, app); // 50% to 150%
-    variable_item_set_current_value_index(item, 50); // Default to 100%
-    variable_item_set_current_value_text(item, "100%");
-
-    // Add time edit button
-    variable_item_list_add(app->step_menu, "Edit Time", 1, time_edit_callback, app);
-
     // Initialize steps
     for(uint8_t i = 0; i < COUNT_OF(step_names); i++) {
         app->steps[i].base_time = default_times[i];
         app->steps[i].push_pull = 0;
         app->steps[i].scale_percent = 100.0f;
-        app->steps[i].step_index = i; // Store index for display name
+        app->steps[i].step_index = i;
         film_time_calculate_final_time(&app->steps[i]);
         submenu_add_item(app->main_menu, app->steps[i].display_name, i, step_menu_callback, app);
     }
+
+    // Initialize step menu items
+    init_step_menu(app);
 
     return app;
 }

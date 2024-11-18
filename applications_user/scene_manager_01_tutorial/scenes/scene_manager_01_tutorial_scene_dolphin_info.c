@@ -1,5 +1,7 @@
 #include "../scene_manager_01_tutorial.h"
+#include "applications_user/scene_manager_01_tutorial/elements/progress_bar.h"
 #include "scene_manager_01_tutorial_scene.h"
+#include <gui/elements.h>
 
 void scene_manager_01_tutorial_scene_dolphin_info_on_enter(void* context) {
     SceneManager01Tutorial* app = context;
@@ -25,6 +27,9 @@ void scene_manager_01_tutorial_scene_dolphin_info_on_enter(void* context) {
         "facilities.\n\n"
         "Note: This is for educational purposes only. Always consult marine "
         "biology experts for actual dolphin care.");
+
+    // WidgetElement* progress_bar = widget_element_progress_bar_create(10, 10, 80, 20, 23);
+    // widget_add_element(app->widget, progress_bar);
 
     view_dispatcher_switch_to_view(app->view_dispatcher, SceneManager01TutorialViewWidget);
 }

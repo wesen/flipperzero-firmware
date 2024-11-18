@@ -36,4 +36,4 @@ typedef enum {
 
 FilmTimeApp* film_time_app_alloc(void);
 void film_time_app_free(FilmTimeApp* app);
-int32_t film_time_app(FilmTimeApp* app);
+int32_t film_time_app(void* p);

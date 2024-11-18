@@ -423,3 +423,78 @@ Added a warning modal scene to demonstrate modal dialog implementation:
 - Added scene handling for warning modal
 - Updated main scene to trigger warning on OK button
 - Added proper navigation between scenes
+- Added state tracking for selections
+
+# Film Development Timer Bug Fixes
+
+Fixed compilation errors in film development timer app:
+- Fixed function signature mismatch in film_time_app
+- Corrected number input callback implementation
+- Added descriptive header text for time input
+
+# Film Development Timer UI Improvements
+
+Enhanced number input interface for time editing:
+- Added descriptive header showing which step is being edited
+- Improved menu item text for time editing
+- Better organized menu initialization code
+- Fixed number input view integration
+
+# Time Edit Widget Extraction
+
+Extracted time editing functionality into a reusable widget module to improve code organization and maintainability.
+
+- Created new TimeEditWidget module with separate .h and .c files
+- Moved time editing drawing and input handling code to the new module
+- Updated intervalometer to use the new TimeEditWidget
+
+# Time Edit Widget Input Handling
+
+Fixed input handling for time edit widget to properly handle keyboard events:
+- Added proper input forwarding to time edit widget when in edit mode
+- Fixed edit mode toggle behavior
+- Improved cursor movement and value editing
+- Maintained existing navigation behavior for non-timer fields
+
+# Film Developer Pause Menu Feature
+
+Added pause menu functionality to allow pausing development process and provide rewind/skip options.
+
+- Added PauseMenuView class for pause screen UI
+- Implemented pause/resume with OK button
+- Added rewind and skip functionality from pause menu
+- Added time display showing current progress
+
+# Scene Manager Integration
+
+Added scene manager to handle application state transitions and navigation
+
+- Added scene configuration and handlers
+- Integrated scene manager with view dispatcher
+- Set up main, menu, and pause scenes
+- Added proper scene lifecycle management
+
+# Scene Manager Integration for Film Developer
+
+Added scene manager to handle application state transitions and navigation in film developer app
+
+- Added SceneManager to FilmDeveloperApp struct
+- Added scene manager initialization and cleanup
+- Added custom event and back event handlers
+- Integrated scene manager with view dispatcher
+- Added proper scene lifecycle management
+- Fixed memory management for views and controllers
+
+# Scene System Conversion
+
+Converted the film developer app scene and view system from C++ to C to:
+- Match the standard Flipper Zero app structure
+- Improve compatibility with other Flipper Zero apps
+- Make maintenance easier by following common patterns
+- Reduce complexity by removing C++ features
+
+Changes:
+- Converted MainView to C-style implementation
+- Updated scene system to use standard Flipper Zero patterns
+- Simplified view state management
+- Removed C++ specific features and patterns

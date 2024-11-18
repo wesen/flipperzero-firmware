@@ -105,7 +105,7 @@ View* widget_get_view(Widget* widget) {
     return widget->view;
 }
 
-static void widget_add_element(Widget* widget, WidgetElement* element) {
+void widget_add_element(Widget* widget, WidgetElement* element) {
     furi_assert(widget);
     furi_assert(element);
 
