@@ -13,7 +13,6 @@ public:
     ~SubMenuCpp() {
         if(submenu) {
             submenu_free(submenu);
-            submenu = nullptr;
             view = nullptr;
         }
     }
@@ -22,7 +21,6 @@ public:
         // Instead of ViewCpp::init(), we'll use the submenu's view
         submenu = submenu_alloc();
         view = submenu_get_view(submenu);
-        // view_set_context(view, this);
     }
 
     void add_item(const char* label, uint32_t index, SubmenuItemCallback callback, void* context) {
@@ -56,6 +54,7 @@ protected:
         return false;
     }
 
+private:
     Submenu* submenu = nullptr;
 };
 

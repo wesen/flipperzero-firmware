@@ -5,6 +5,7 @@
 #include "FirstView.hpp"
 #include "SecondView.hpp"
 #include "ThirdView.hpp"
+#include "FourthView.hpp"
 #include <gui/gui.h>
 #include <gui/view_dispatcher.h>
 
@@ -16,12 +17,14 @@ public:
         ViewFirst,
         ViewSecond,
         ViewThird,
+        ViewFourth,
     };
 
     enum class State {
         First,
         Second,
         Third,
+        Fourth,
     };
 
     ExampleCppViewApp() = default;
@@ -38,19 +41,23 @@ public:
         first_view.set_view_dispatcher(view_dispatcher);
         second_view.set_view_dispatcher(view_dispatcher);
         third_view.set_view_dispatcher(view_dispatcher);
+        fourth_view.set_view_dispatcher(view_dispatcher);
 
         first_view.init();
         second_view.init();
         third_view.init();
+        fourth_view.init();
 
         // Add views
         view_dispatcher_add_view(view_dispatcher, ViewFirst, first_view.get_view());
         view_dispatcher_add_view(view_dispatcher, ViewSecond, second_view.get_view());
         view_dispatcher_add_view(view_dispatcher, ViewThird, third_view.get_view());
+        view_dispatcher_add_view(view_dispatcher, ViewFourth, fourth_view.get_view());
     }
 
     ~ExampleCppViewApp() {
         if(view_dispatcher != nullptr) {
+            view_dispatcher_remove_view(view_dispatcher, ViewFourth);
             view_dispatcher_remove_view(view_dispatcher, ViewThird);
             view_dispatcher_remove_view(view_dispatcher, ViewSecond);
             view_dispatcher_remove_view(view_dispatcher, ViewFirst);
@@ -60,7 +67,7 @@ public:
     }
 
     void run() {
-        view_dispatcher_switch_to_view(view_dispatcher, ViewFirst);
+        view_dispatcher_switch_to_view(view_dispatcher, ViewFourth);
         view_dispatcher_run(view_dispatcher);
     }
 
@@ -68,8 +75,9 @@ private:
     FirstView first_view;
     SecondView second_view;
     ThirdView third_view;
-    ViewDispatcher* view_dispatcher;
-    Gui* gui;
+    FourthView fourth_view;
+    ViewDispatcher* view_dispatcher = nullptr;
+    Gui* gui = nullptr;
     State state = State::First;
 
     static bool custom_callback(void* context, uint32_t event) {
@@ -83,6 +91,9 @@ private:
             } else if(app->state == State::Second) {
                 app->state = State::Third;
                 view_dispatcher_switch_to_view(app->view_dispatcher, ViewThird);
+            } else if(app->state == State::Third) {
+                app->state = State::Fourth;
+                view_dispatcher_switch_to_view(app->view_dispatcher, ViewFourth);
             } else {
                 app->state = State::First;
                 view_dispatcher_switch_to_view(app->view_dispatcher, ViewFirst);
@@ -95,7 +106,6 @@ private:
     static bool navigation_callback(void* context) {
         furi_assert(context);
         ExampleCppViewApp* app = static_cast<ExampleCppViewApp*>(context);
-        // Back means exit the application
         view_dispatcher_stop(app->view_dispatcher);
         return true;
     }
