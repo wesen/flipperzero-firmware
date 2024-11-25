@@ -120,7 +120,6 @@ protected:
         return ModelHandle<T>(view);
     }
 
-private:
     View* view = nullptr;
     ViewDispatcher* view_dispatcher = nullptr;
 

@@ -4,6 +4,7 @@
 #include "ViewModel.hpp"
 #include "FirstView.hpp"
 #include "SecondView.hpp"
+#include "ThirdView.hpp"
 #include <gui/gui.h>
 #include <gui/view_dispatcher.h>
 
@@ -14,11 +15,13 @@ public:
     enum ViewId {
         ViewFirst,
         ViewSecond,
+        ViewThird,
     };
 
     enum class State {
         First,
         Second,
+        Third,
     };
 
     ExampleCppViewApp() = default;
@@ -34,17 +37,21 @@ public:
         // Set view dispatchers
         first_view.set_view_dispatcher(view_dispatcher);
         second_view.set_view_dispatcher(view_dispatcher);
+        third_view.set_view_dispatcher(view_dispatcher);
 
         first_view.init();
         second_view.init();
+        third_view.init();
 
         // Add views
         view_dispatcher_add_view(view_dispatcher, ViewFirst, first_view.get_view());
         view_dispatcher_add_view(view_dispatcher, ViewSecond, second_view.get_view());
+        view_dispatcher_add_view(view_dispatcher, ViewThird, third_view.get_view());
     }
 
     ~ExampleCppViewApp() {
         if(view_dispatcher != nullptr) {
+            view_dispatcher_remove_view(view_dispatcher, ViewThird);
             view_dispatcher_remove_view(view_dispatcher, ViewSecond);
             view_dispatcher_remove_view(view_dispatcher, ViewFirst);
             view_dispatcher_free(view_dispatcher);
@@ -60,6 +67,7 @@ public:
 private:
     FirstView first_view;
     SecondView second_view;
+    ThirdView third_view;
     ViewDispatcher* view_dispatcher;
     Gui* gui;
     State state = State::First;
@@ -72,6 +80,9 @@ private:
             if(app->state == State::First) {
                 app->state = State::Second;
                 view_dispatcher_switch_to_view(app->view_dispatcher, ViewSecond);
+            } else if(app->state == State::Second) {
+                app->state = State::Third;
+                view_dispatcher_switch_to_view(app->view_dispatcher, ViewThird);
             } else {
                 app->state = State::First;
                 view_dispatcher_switch_to_view(app->view_dispatcher, ViewFirst);
