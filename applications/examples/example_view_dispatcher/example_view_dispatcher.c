@@ -50,12 +50,12 @@ static bool example_view_dispatcher_app_navigation_callback(void* context) {
 // This function is called when there are custom events to process.
 static bool example_view_dispatcher_app_custom_event_callback(void* context, uint32_t event) {
     furi_assert(context);
-    ExampleViewDispatcherApp* app = context;
+    // ExampleViewDispatcherApp* app = context;
     // The event numerical value can mean different things (the application is responsible to uphold its chosen convention)
     // In this example, the only possible meaning is the view index to switch to.
     furi_assert(event < ViewIndexCount);
     // Switch to the requested view.
-    view_dispatcher_switch_to_view(app->view_dispatcher, event);
+    // view_dispatcher_switch_to_view(app->view_dispatcher, event);
 
     return true;
 }
@@ -75,15 +75,15 @@ static void example_view_dispatcher_app_button_callback(
 }
 
 // This function is called when the user activates the "Switch View" submenu item.
-static void example_view_dispatcher_app_submenu_callback(void* context, uint32_t index) {
-    furi_assert(context);
-    ExampleViewDispatcherApp* app = context;
-    // Only request the view switch if the user activates the "Switch View" item.
-    if(index == SubmenuIndexSwitchView) {
-        // Request switch to the Widget view via the custom event queue.
-        view_dispatcher_send_custom_event(app->view_dispatcher, ViewIndexWidget);
-    }
-}
+// static void example_view_dispatcher_app_submenu_callback(void* context, uint32_t index) {
+//     furi_assert(context);
+//     ExampleViewDispatcherApp* app = context;
+//     // Only request the view switch if the user activates the "Switch View" item.
+//     if(index == SubmenuIndexSwitchView) {
+//         // Request switch to the Widget view via the custom event queue.
+//         view_dispatcher_send_custom_event(app->view_dispatcher, ViewIndexWidget);
+//     }
+// }
 
 // Application constructor function.
 static ExampleViewDispatcherApp* example_view_dispatcher_app_alloc() {
@@ -100,15 +100,15 @@ static ExampleViewDispatcherApp* example_view_dispatcher_app_alloc() {
         "Switch View",
         example_view_dispatcher_app_button_callback,
         app);
-    // Create and initialize the Submenu view.
-    app->submenu = submenu_alloc();
-    submenu_add_item(app->submenu, "Do Nothing", SubmenuIndexNothing, NULL, NULL);
-    submenu_add_item(
-        app->submenu,
-        "Switch View",
-        SubmenuIndexSwitchView,
-        example_view_dispatcher_app_submenu_callback,
-        app);
+    // // Create and initialize the Submenu view.
+    // app->submenu = submenu_alloc();
+    // submenu_add_item(app->submenu, "Do Nothing", SubmenuIndexNothing, NULL, NULL);
+    // submenu_add_item(
+    //     app->submenu,
+    //     "Switch View",
+    //     SubmenuIndexSwitchView,
+    //     example_view_dispatcher_app_submenu_callback,
+    //     app);
     // Create the ViewDispatcher instance.
     app->view_dispatcher = view_dispatcher_alloc();
     // Let the GUI know about this ViewDispatcher instance.
@@ -116,17 +116,17 @@ static ExampleViewDispatcherApp* example_view_dispatcher_app_alloc() {
     // Register the views within the ViewDispatcher instance. This alone will not show any of them on the screen.
     // Each view must have its own index to refer to it later (it is best done via an enumeration as shown here).
     view_dispatcher_add_view(app->view_dispatcher, ViewIndexWidget, widget_get_view(app->widget));
-    view_dispatcher_add_view(
-        app->view_dispatcher, ViewIndexSubmenu, submenu_get_view(app->submenu));
-    // Set the custom event callback. It will be called each time a custom event is scheduled
-    // using the view_dispatcher_send_custom_callback() function.
+    // view_dispatcher_add_view(
+    //     app->view_dispatcher, ViewIndexSubmenu, submenu_get_view(app->submenu));
+    // // Set the custom event callback. It will be called each time a custom event is scheduled
+    // // using the view_dispatcher_send_custom_callback() function.
     view_dispatcher_set_custom_event_callback(
         app->view_dispatcher, example_view_dispatcher_app_custom_event_callback);
-    // Set the navigation, or back button callback. It will be called if the user pressed the Back button
-    // and the event was not handled in the currently displayed view.
+    // // Set the navigation, or back button callback. It will be called if the user pressed the Back button
+    // // and the event was not handled in the currently displayed view.
     view_dispatcher_set_navigation_event_callback(
         app->view_dispatcher, example_view_dispatcher_app_navigation_callback);
-    // The context will be passed to the callbacks as a parameter, so we have access to our application object.
+    // // The context will be passed to the callbacks as a parameter, so we have access to our application object.
     view_dispatcher_set_event_callback_context(app->view_dispatcher, app);
 
     return app;
@@ -137,12 +137,12 @@ static void example_view_dispatcher_app_free(ExampleViewDispatcherApp* app) {
     // All views must be un-registered (removed) from a ViewDispatcher instance
     // before deleting it. Failure to do so will result in a crash.
     view_dispatcher_remove_view(app->view_dispatcher, ViewIndexWidget);
-    view_dispatcher_remove_view(app->view_dispatcher, ViewIndexSubmenu);
+    // view_dispatcher_remove_view(app->view_dispatcher, ViewIndexSubmenu);
     // Now it is safe to delete the ViewDispatcher instance.
     view_dispatcher_free(app->view_dispatcher);
     // Delete the views
     widget_free(app->widget);
-    submenu_free(app->submenu);
+    // submenu_free(app->submenu);
     // End access to hte the GUI API.
     furi_record_close(RECORD_GUI);
     // Free the remaining memory.
@@ -151,7 +151,7 @@ static void example_view_dispatcher_app_free(ExampleViewDispatcherApp* app) {
 
 static void example_view_dispatcher_app_run(ExampleViewDispatcherApp* app) {
     // Display the Widget view on the screen.
-    view_dispatcher_switch_to_view(app->view_dispatcher, ViewIndexWidget);
+    // view_dispatcher_switch_to_view(app->view_dispatcher, ViewIndexWidget);
     // This function will block until view_dispatcher_stop() is called.
     // Internally, it uses a FuriEventLoop (see FuriEventLoop examples for more info on this).
     view_dispatcher_run(app->view_dispatcher);

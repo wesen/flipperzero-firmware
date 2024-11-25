@@ -1,0 +1,16 @@
+App(
+    appid="example_cpp_view",
+    name="Example C++ View",
+    apptype=FlipperAppType.EXTERNAL,
+    entry_point="example_cpp_view_app",
+    cdefines=["APP_EXAMPLE_CPP_VIEW"],
+    requires=[
+        "gui",
+    ],
+    stack_size=2 * 1024,
+    fap_category="Examples",
+    fap_author="Your Name",
+    fap_weburl="https://github.com/your_name/your_repo",
+    fap_version="1.0",
+    fap_description="Example application demonstrating C++ views",
+)
