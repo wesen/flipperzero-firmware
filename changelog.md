@@ -498,3 +498,11 @@ Changes:
 - Updated scene system to use standard Flipper Zero patterns
 - Simplified view state management
 - Removed C++ specific features and patterns
+
+# View Separation
+Separated views into individual files for better code organization and maintainability.
+
+- Created FirstView.hpp for the first view implementation
+- Created SecondView.hpp for the second view implementation
+- Created ViewModel.hpp for shared data structures
+- Updated example_cpp_view.hpp to use the new files

@@ -126,8 +126,6 @@ private:
 
     // Static wrapper functions that route callbacks to instance methods
     static void drawWrapper(Canvas* canvas, void* model) {
-        UNUSED(canvas);
-        UNUSED(model);
         canvas_clear(canvas);
         canvas_set_font(canvas, FontPrimary);
         canvas_draw_str(canvas, 39, 31, "Main Screen");
@@ -137,29 +135,21 @@ private:
     }
 
     static bool inputWrapper(InputEvent* event, void* context) {
-        UNUSED(event);
-        UNUSED(context);
-        // return false;
         ViewCpp* instance = static_cast<ViewCpp*>(context);
         return instance->input(event);
     }
 
     static bool customWrapper(uint32_t event, void* context) {
-        UNUSED(event);
-        UNUSED(context);
-        // return false;
         ViewCpp* instance = static_cast<ViewCpp*>(context);
         return instance->custom(event);
     }
 
     static void enterWrapper(void* context) {
-        UNUSED(context);
         ViewCpp* instance = static_cast<ViewCpp*>(context);
         instance->enter();
     }
 
     static void exitWrapper(void* context) {
-        UNUSED(context);
         ViewCpp* instance = static_cast<ViewCpp*>(context);
         instance->exit();
     }
