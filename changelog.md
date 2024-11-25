@@ -506,3 +506,40 @@ Separated views into individual files for better code organization and maintaina
 - Created SecondView.hpp for the second view implementation
 - Created ViewModel.hpp for shared data structures
 - Updated example_cpp_view.hpp to use the new files
+
+## Add SubMenuCpp wrapper and third view to example app
+
+Added a C++ wrapper for the submenu module and integrated it as a third view in the example app to demonstrate menu functionality. The views now cycle between First -> Second -> Menu -> First.
+
+- Created SubMenuCpp wrapper class for C submenu module
+- Added ThirdView using SubMenuCpp
+- Updated ExampleCppViewApp to handle three-way view cycling
+
+## Add DialogExCpp wrapper and fourth view to example app
+
+Added a C++ wrapper for the dialog_ex module and integrated it as a fourth view in the example app to demonstrate dialog functionality. The views now cycle between First -> Second -> Menu -> Dialog -> First.
+
+- Created DialogExCpp wrapper class for C dialog_ex module
+- Added FourthView using DialogExCpp with interactive buttons
+- Updated ExampleCppViewApp to handle four-way view cycling
+- Added proper cleanup and initialization for the new view
+
+## Add C++ wrappers for Loading, TextBox and FileBrowser modules
+
+Added C++ wrappers for additional GUI modules to provide a consistent C++ interface:
+
+- Created LoadingCpp wrapper for loading animation module
+- Created TextBoxCpp wrapper for text display and scrolling
+- Created FileBrowserCpp wrapper for file system navigation
+- Maintained consistent initialization and cleanup patterns
+- Added proper resource management with RAII
+
+## Add test views for Loading, TextBox and FileBrowser widgets
+
+Added example views demonstrating the usage of additional GUI widgets:
+
+- Created FifthView using LoadingCpp for loading animation demo
+- Created SixthView using TextBoxCpp for scrollable text display
+- Created SeventhView using FileBrowserCpp for file system navigation
+- Updated ExampleCppViewApp to cycle through all seven views
+- Added proper initialization and cleanup for new views

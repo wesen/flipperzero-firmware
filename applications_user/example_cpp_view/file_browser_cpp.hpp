@@ -7,8 +7,7 @@ namespace flipper {
 
 class FileBrowserCpp : public ViewCpp {
 public:
-    FileBrowserCpp(FuriString* result_path)
-        : result_path(result_path) {
+    FileBrowserCpp(FuriString* result_path) : result_path(result_path) {
     }
 
     ~FileBrowserCpp() {
@@ -30,8 +29,7 @@ public:
         bool hide_dot_files,
         const Icon* file_icon,
         bool hide_ext) {
-        file_browser_configure(
-            browser, extension, base_path, skip_assets, hide_dot_files, file_icon, hide_ext);
+        file_browser_configure(browser, extension, base_path, skip_assets, hide_dot_files, file_icon, hide_ext);
     }
 
     void start(FuriString* path) {
@@ -66,4 +64,4 @@ private:
     FuriString* result_path = nullptr;
 };
 
-} // namespace flipper
+} // namespace flipper 

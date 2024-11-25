@@ -1,7 +1,6 @@
 #pragma once
 
 #include <gui/modules/dialog_ex.h>
-#include <gui/view.h>
 #include "view_cpp.hpp"
 
 namespace flipper {
@@ -19,6 +18,7 @@ public:
     }
 
     void init() override {
+        // Instead of ViewCpp::init(), we'll use the dialog's view
         dialog = dialog_ex_alloc();
         view = dialog_ex_get_view(dialog);
         dialog_ex_set_context(dialog, this);
