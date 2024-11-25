@@ -6,6 +6,7 @@
 #include "SecondView.hpp"
 #include "ThirdView.hpp"
 #include "FourthView.hpp"
+#include "FifthView.hpp"
 #include <gui/gui.h>
 #include <gui/view_dispatcher.h>
 
@@ -18,6 +19,7 @@ public:
         ViewSecond,
         ViewThird,
         ViewFourth,
+        ViewFifth,
     };
 
     enum class State {
@@ -25,6 +27,7 @@ public:
         Second,
         Third,
         Fourth,
+        Fifth,
     };
 
     ExampleCppViewApp() = default;
@@ -42,21 +45,25 @@ public:
         second_view.set_view_dispatcher(view_dispatcher);
         third_view.set_view_dispatcher(view_dispatcher);
         fourth_view.set_view_dispatcher(view_dispatcher);
+        fifth_view.set_view_dispatcher(view_dispatcher);
 
         first_view.init();
         second_view.init();
         third_view.init();
         fourth_view.init();
+        fifth_view.init();
 
         // Add views
         view_dispatcher_add_view(view_dispatcher, ViewFirst, first_view.get_view());
         view_dispatcher_add_view(view_dispatcher, ViewSecond, second_view.get_view());
         view_dispatcher_add_view(view_dispatcher, ViewThird, third_view.get_view());
         view_dispatcher_add_view(view_dispatcher, ViewFourth, fourth_view.get_view());
+        view_dispatcher_add_view(view_dispatcher, ViewFifth, fifth_view.get_view());
     }
 
     ~ExampleCppViewApp() {
         if(view_dispatcher != nullptr) {
+            view_dispatcher_remove_view(view_dispatcher, ViewFifth);
             view_dispatcher_remove_view(view_dispatcher, ViewFourth);
             view_dispatcher_remove_view(view_dispatcher, ViewThird);
             view_dispatcher_remove_view(view_dispatcher, ViewSecond);
@@ -67,7 +74,7 @@ public:
     }
 
     void run() {
-        view_dispatcher_switch_to_view(view_dispatcher, ViewFourth);
+        view_dispatcher_switch_to_view(view_dispatcher, ViewFifth);
         view_dispatcher_run(view_dispatcher);
     }
 
@@ -76,6 +83,7 @@ private:
     SecondView second_view;
     ThirdView third_view;
     FourthView fourth_view;
+    FifthView fifth_view;
     ViewDispatcher* view_dispatcher = nullptr;
     Gui* gui = nullptr;
     State state = State::First;
@@ -94,6 +102,9 @@ private:
             } else if(app->state == State::Third) {
                 app->state = State::Fourth;
                 view_dispatcher_switch_to_view(app->view_dispatcher, ViewFourth);
+            } else if(app->state == State::Fourth) {
+                app->state = State::Fifth;
+                view_dispatcher_switch_to_view(app->view_dispatcher, ViewFifth);    
             } else {
                 app->state = State::First;
                 view_dispatcher_switch_to_view(app->view_dispatcher, ViewFirst);
