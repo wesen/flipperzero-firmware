@@ -125,19 +125,19 @@ public:
 
         // Set view dispatchers
         first_view.set_view_dispatcher(view_dispatcher);
-        // second_view.set_view_dispatcher(view_dispatcher);
+        second_view.set_view_dispatcher(view_dispatcher);
 
         first_view.init();
-        // second_view.init();
+        second_view.init();
 
         // Add views
         view_dispatcher_add_view(view_dispatcher, ViewFirst, first_view.get_view());
-        // view_dispatcher_add_view(view_dispatcher, ViewSecond, second_view.get_view());
+        view_dispatcher_add_view(view_dispatcher, ViewSecond, second_view.get_view());
     }
 
     ~ExampleCppViewApp() {
         if(view_dispatcher != nullptr) {
-            // view_dispatcher_remove_view(view_dispatcher, ViewSecond);
+            view_dispatcher_remove_view(view_dispatcher, ViewSecond);
             view_dispatcher_remove_view(view_dispatcher, ViewFirst);
             view_dispatcher_free(view_dispatcher);
             furi_record_close(RECORD_GUI);
