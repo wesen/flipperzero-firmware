@@ -24,15 +24,16 @@ public:
     void init() override {
         // call super init
         ViewCpp::init();
-        // ViewModel* initial_model;
-        // initial_model = new ViewModel();
-        // set_model(initial_model);
+        ViewModel* initial_model;
+        initial_model = new ViewModel();
+        set_model(initial_model);
     }
 
 protected:
     void draw(Canvas* canvas, void* model) override {
         UNUSED(canvas);
         UNUSED(model);
+        canvas_clear(canvas);
         canvas_set_font(canvas, FontPrimary);
         canvas_draw_str(canvas, 39, 31, "First View");
 
@@ -47,17 +48,16 @@ protected:
     }
 
     bool input(InputEvent* event) override {
-        UNUSED(event);
-        // if(event->type == InputTypeShort) {
-        //     if(event->key == InputKeyOk) {
-        //         auto m = get_model<ViewModel>();
-        //         m->counter++;
-        //         return true;
-        //     } else if(event->key == InputKeyRight) {
-        //         send_custom_event(static_cast<uint32_t>(CustomEvent::ToggleScene));
-        //         return true;
-        //     }
-        // }
+        if(event->type == InputTypeShort) {
+            if(event->key == InputKeyOk) {
+                // auto m = get_model<ViewModel>();
+                // m->counter++;
+                return true;
+            } else if(event->key == InputKeyRight) {
+                send_custom_event(static_cast<uint32_t>(CustomEvent::ToggleScene));
+                return true;
+            }
+        }
         return false;
     }
 
@@ -67,32 +67,36 @@ protected:
 class SecondView : public ViewCpp {
 public:
     SecondView() {
-        ViewModel initial_model;
-        set_model(&initial_model);
+    }
+
+    void init() override {
+        // call super init
+        ViewCpp::init();
+        // ViewModel initial_model;
+        // set_model(&initial_model);
     }
 
 protected:
     void draw(Canvas* canvas, void* model) override {
-        UNUSED(canvas);
         UNUSED(model);
+        canvas_clear(canvas);
         canvas_set_font(canvas, FontPrimary);
         canvas_draw_str(canvas, 33, 31, "Second View");
 
-        auto m = get_model<ViewModel>();
-        canvas_set_font(canvas, FontSecondary);
-        canvas_draw_str(canvas, 12, 41, m->message);
+        // auto m = get_model<ViewModel>();
+        // canvas_set_font(canvas, FontSecondary);
+        // canvas_draw_str(canvas, 12, 41, m->message);
 
         canvas_draw_str(canvas, 24, 54, "Press OK/Right to switch");
     }
 
     bool input(InputEvent* event) override {
-        UNUSED(event);
-        // if(event->type == InputTypeShort) {
-        //     if(event->key == InputKeyOk || event->key == InputKeyRight) {
-        //         send_custom_event(static_cast<uint32_t>(CustomEvent::ToggleScene));
-        //         return true;
-        //     }
-        // }
+        if(event->type == InputTypeShort) {
+            if(event->key == InputKeyOk || event->key == InputKeyRight) {
+                send_custom_event(static_cast<uint32_t>(CustomEvent::ToggleScene));
+                return true;
+            }
+        }
         return false;
     }
 };
@@ -121,14 +125,14 @@ public:
 
         // Set view dispatchers
         first_view.set_view_dispatcher(view_dispatcher);
-        //     second_view.set_view_dispatcher(view_dispatcher);
+        // second_view.set_view_dispatcher(view_dispatcher);
 
         first_view.init();
-        //     second_view.init();
+        // second_view.init();
 
         // Add views
         view_dispatcher_add_view(view_dispatcher, ViewFirst, first_view.get_view());
-        //     view_dispatcher_add_view(view_dispatcher, ViewSecond, second_view.get_view());
+        // view_dispatcher_add_view(view_dispatcher, ViewSecond, second_view.get_view());
     }
 
     ~ExampleCppViewApp() {
@@ -147,28 +151,24 @@ public:
 
 private:
     FirstView first_view;
-    // SecondView second_view;
+    SecondView second_view;
     ViewDispatcher* view_dispatcher;
     Gui* gui;
     State state = State::First;
 
     static bool custom_callback(void* context, uint32_t event) {
         auto* app = static_cast<ExampleCppViewApp*>(context);
-        UNUSED(app);
-        UNUSED(event);
-
-        app->state = State::First;
 
         // Switch state
-        // if(event == static_cast<uint32_t>(CustomEvent::ToggleScene)) {
-        //     if(app->state == State::First) {
-        //         app->state = State::Second;
-        //         view_dispatcher_switch_to_view(app->view_dispatcher, ViewSecond);
-        //     } else {
-        //         app->state = State::First;
-        //         view_dispatcher_switch_to_view(app->view_dispatcher, ViewFirst);
-        //     }
-        // }
+        if(event == static_cast<uint32_t>(CustomEvent::ToggleScene)) {
+            if(app->state == State::First) {
+                app->state = State::Second;
+                view_dispatcher_switch_to_view(app->view_dispatcher, ViewSecond);
+            } else {
+                app->state = State::First;
+                view_dispatcher_switch_to_view(app->view_dispatcher, ViewFirst);
+            }
+        }
 
         return true;
     }

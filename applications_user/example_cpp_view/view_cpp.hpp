@@ -39,11 +39,17 @@ public:
 
     virtual void init() {
         view = view_alloc();
-        // view_allocate_model(view, ViewModelTypeLocking, sizeof(ViewContext));
-        // ViewContext* ctx = static_cast<ViewContext*>(view_get_model(view));
-        // ctx->instance = this;
-        // ctx->model = nullptr;
-        // view_set_context(view, ctx);
+        view_allocate_model(view, ViewModelTypeLocking, sizeof(ViewContext));
+        with_view_model_cpp(
+            view,
+            ViewContext*,
+            model,
+            {
+                model->instance = this;
+                model->model = nullptr;
+            },
+            true);
+        view_set_context(view, this);
         view_set_draw_callback(view, &ViewCpp::drawWrapper);
         view_set_input_callback(view, &ViewCpp::inputWrapper);
         view_set_custom_callback(view, &ViewCpp::customWrapper);
@@ -119,47 +125,43 @@ private:
     ViewDispatcher* view_dispatcher = nullptr;
 
     // Static wrapper functions that route callbacks to instance methods
-    static void drawWrapper(Canvas* canvas, void* context) {
+    static void drawWrapper(Canvas* canvas, void* model) {
         UNUSED(canvas);
-        UNUSED(context);
+        UNUSED(model);
         canvas_clear(canvas);
         canvas_set_font(canvas, FontPrimary);
         canvas_draw_str(canvas, 39, 31, "Main Screen");
-        // ViewContext* ctx = static_cast<ViewContext*>(context);
-        // ViewCpp* instance = static_cast<ViewCpp*>(ctx->instance);
-        // instance->draw(canvas, ctx->model);
+        ViewContext* ctx = static_cast<ViewContext*>(model);
+        ViewCpp* instance = static_cast<ViewCpp*>(ctx->instance);
+        instance->draw(canvas, ctx->model);
     }
 
     static bool inputWrapper(InputEvent* event, void* context) {
         UNUSED(event);
         UNUSED(context);
-        return false;
-        // ViewContext* ctx = static_cast<ViewContext*>(context);
-        // ViewCpp* instance = static_cast<ViewCpp*>(ctx->instance);
-        // return instance->input(event);
+        // return false;
+        ViewCpp* instance = static_cast<ViewCpp*>(context);
+        return instance->input(event);
     }
 
     static bool customWrapper(uint32_t event, void* context) {
         UNUSED(event);
         UNUSED(context);
-        return false;
-        // ViewContext* ctx = static_cast<ViewContext*>(context);
-        // ViewCpp* instance = static_cast<ViewCpp*>(ctx->instance);
-        // return instance->custom(event);
+        // return false;
+        ViewCpp* instance = static_cast<ViewCpp*>(context);
+        return instance->custom(event);
     }
 
     static void enterWrapper(void* context) {
         UNUSED(context);
-        // ViewContext* ctx = static_cast<ViewContext*>(context);
-        // ViewCpp* instance = static_cast<ViewCpp*>(ctx->instance);
-        // instance->enter();
+        ViewCpp* instance = static_cast<ViewCpp*>(context);
+        instance->enter();
     }
 
     static void exitWrapper(void* context) {
         UNUSED(context);
-        // ViewContext* ctx = static_cast<ViewContext*>(context);
-        // ViewCpp* instance = static_cast<ViewCpp*>(ctx->instance);
-        // instance->exit();
+        ViewCpp* instance = static_cast<ViewCpp*>(context);
+        instance->exit();
     }
 };
 
