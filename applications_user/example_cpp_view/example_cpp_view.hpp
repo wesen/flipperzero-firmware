@@ -38,11 +38,12 @@ protected:
         canvas_draw_str(canvas, 39, 31, "First View");
 
         // auto m = get_model<ViewModel>();
-        // canvas_set_font(canvas, FontSecondary);
-        // canvas_draw_str(canvas, 33, 41, "Counter:");
-        // char str[16];
-        // snprintf(str, sizeof(str), "%d", m->counter);
-        // canvas_draw_str(canvas, 78, 41, str);
+        ViewModel* m = static_cast<ViewModel*>(model);
+        canvas_set_font(canvas, FontSecondary);
+        canvas_draw_str(canvas, 33, 41, "Counter:");
+        char str[16];
+        snprintf(str, sizeof(str), "%d", m->counter);
+        canvas_draw_str(canvas, 78, 41, str);
 
         // canvas_draw_str(canvas, 24, 54, "Press OK/Right to switch");
     }
@@ -50,8 +51,8 @@ protected:
     bool input(InputEvent* event) override {
         if(event->type == InputTypeShort) {
             if(event->key == InputKeyOk) {
-                // auto m = get_model<ViewModel>();
-                // m->counter++;
+                auto m = get_model<ViewModel>();
+                m->counter++;
                 return true;
             } else if(event->key == InputKeyRight) {
                 send_custom_event(static_cast<uint32_t>(CustomEvent::ToggleScene));
@@ -72,8 +73,9 @@ public:
     void init() override {
         // call super init
         ViewCpp::init();
-        // ViewModel initial_model;
-        // set_model(&initial_model);
+        ViewModel* initial_model;
+        initial_model = new ViewModel();
+        set_model(initial_model);
     }
 
 protected:
@@ -83,9 +85,9 @@ protected:
         canvas_set_font(canvas, FontPrimary);
         canvas_draw_str(canvas, 33, 31, "Second View");
 
-        // auto m = get_model<ViewModel>();
-        // canvas_set_font(canvas, FontSecondary);
-        // canvas_draw_str(canvas, 12, 41, m->message);
+        auto m = get_model<ViewModel>();
+        canvas_set_font(canvas, FontSecondary);
+        canvas_draw_str(canvas, 12, 41, m->message);
 
         canvas_draw_str(canvas, 24, 54, "Press OK/Right to switch");
     }
