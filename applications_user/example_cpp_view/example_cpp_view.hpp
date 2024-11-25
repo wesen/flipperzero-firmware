@@ -9,6 +9,9 @@
 #include "FifthView.hpp"
 #include "SixthView.hpp"
 #include "SeventhView.hpp"
+#include "EighthView.hpp"
+#include "NinthView.hpp"
+#include "TenthView.hpp"
 #include <gui/gui.h>
 #include <gui/view_dispatcher.h>
 
@@ -24,6 +27,9 @@ public:
         ViewFifth,
         ViewSixth,
         ViewSeventh,
+        ViewEighth,
+        ViewNinth,
+        ViewTenth,
     };
 
     enum class State {
@@ -34,6 +40,9 @@ public:
         Fifth,
         Sixth,
         Seventh,
+        Eighth,
+        Ninth,
+        Tenth,
     };
 
     ExampleCppViewApp() = default;
@@ -54,6 +63,9 @@ public:
         fifth_view.set_view_dispatcher(view_dispatcher);
         sixth_view.set_view_dispatcher(view_dispatcher);
         seventh_view.set_view_dispatcher(view_dispatcher);
+        eighth_view.set_view_dispatcher(view_dispatcher);
+        ninth_view.set_view_dispatcher(view_dispatcher);
+        tenth_view.set_view_dispatcher(view_dispatcher);
 
         first_view.init();
         second_view.init();
@@ -62,6 +74,9 @@ public:
         fifth_view.init();
         sixth_view.init();
         seventh_view.init();
+        eighth_view.init();
+        ninth_view.init();
+        tenth_view.init();
 
         // Add views
         view_dispatcher_add_view(view_dispatcher, ViewFirst, first_view.get_view());
@@ -71,10 +86,16 @@ public:
         view_dispatcher_add_view(view_dispatcher, ViewFifth, fifth_view.get_view());
         view_dispatcher_add_view(view_dispatcher, ViewSixth, sixth_view.get_view());
         view_dispatcher_add_view(view_dispatcher, ViewSeventh, seventh_view.get_view());
+        view_dispatcher_add_view(view_dispatcher, ViewEighth, eighth_view.get_view());
+        view_dispatcher_add_view(view_dispatcher, ViewNinth, ninth_view.get_view());
+        view_dispatcher_add_view(view_dispatcher, ViewTenth, tenth_view.get_view());
     }
 
     ~ExampleCppViewApp() {
         if(view_dispatcher != nullptr) {
+            view_dispatcher_remove_view(view_dispatcher, ViewTenth);
+            view_dispatcher_remove_view(view_dispatcher, ViewNinth);
+            view_dispatcher_remove_view(view_dispatcher, ViewEighth);
             view_dispatcher_remove_view(view_dispatcher, ViewSeventh);
             view_dispatcher_remove_view(view_dispatcher, ViewSixth);
             view_dispatcher_remove_view(view_dispatcher, ViewFifth);
@@ -88,7 +109,7 @@ public:
     }
 
     void run() {
-        view_dispatcher_switch_to_view(view_dispatcher, ViewSeventh);
+        view_dispatcher_switch_to_view(view_dispatcher, ViewEighth);
         state = State::Seventh;
         view_dispatcher_run(view_dispatcher);
     }
@@ -101,6 +122,9 @@ private:
     FifthView fifth_view;
     SixthView sixth_view;
     SeventhView seventh_view;
+    EighthView eighth_view;
+    NinthView ninth_view;
+    TenthView tenth_view;
     ViewDispatcher* view_dispatcher = nullptr;
     Gui* gui = nullptr;
     State state = State::First;
@@ -128,6 +152,15 @@ private:
             } else if(app->state == State::Sixth) {
                 app->state = State::Seventh;
                 view_dispatcher_switch_to_view(app->view_dispatcher, ViewSeventh);
+            } else if(app->state == State::Seventh) {
+                app->state = State::Eighth;
+                view_dispatcher_switch_to_view(app->view_dispatcher, ViewEighth);
+            } else if(app->state == State::Eighth) {
+                app->state = State::Ninth;
+                view_dispatcher_switch_to_view(app->view_dispatcher, ViewNinth);
+            } else if(app->state == State::Ninth) {
+                app->state = State::Tenth;
+                view_dispatcher_switch_to_view(app->view_dispatcher, ViewTenth);
             } else {
                 app->state = State::First;
                 view_dispatcher_switch_to_view(app->view_dispatcher, ViewFirst);
@@ -140,16 +173,7 @@ private:
     static bool navigation_callback(void* context) {
         furi_assert(context);
         ExampleCppViewApp* app = static_cast<ExampleCppViewApp*>(context);
-        // if not in sixth view, stop the view dispatcher
-        if(app->state == State::Sixth) {
-            view_dispatcher_switch_to_view(app->view_dispatcher, ViewSeventh);
-            app->state = State::Seventh;
-        } else if(app->state == State::Fifth) {
-            view_dispatcher_switch_to_view(app->view_dispatcher, ViewSixth);
-            app->state = State::Sixth;
-        } else {
-            view_dispatcher_stop(app->view_dispatcher);
-        }
+        view_dispatcher_stop(app->view_dispatcher);
         return true;
     }
 };
