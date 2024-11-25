@@ -543,3 +543,44 @@ Added example views demonstrating the usage of additional GUI widgets:
 - Created SeventhView using FileBrowserCpp for file system navigation
 - Updated ExampleCppViewApp to cycle through all seven views
 - Added proper initialization and cleanup for new views
+
+## Add C++ wrappers for ByteInput, NumberInput and TextInput modules
+
+Added C++ wrappers for input-related GUI modules to provide a consistent C++ interface:
+
+- Created ByteInputCpp wrapper for byte value input
+- Created NumberInputCpp wrapper for numeric value input
+- Created TextInputCpp wrapper for text string input
+- Maintained consistent initialization and cleanup patterns
+- Added proper resource management with RAII
+- Exposed all key functionality of underlying C modules
+
+## Add test views for ByteInput, NumberInput and TextInput widgets
+
+Added example views demonstrating the usage of input-related GUI widgets:
+
+- Created EighthView using ByteInputCpp for hex byte value input
+- Created NinthView using NumberInputCpp for numeric value input
+- Created TenthView using TextInputCpp for text string input
+- Updated ExampleCppViewApp to cycle through all ten views
+- Added proper initialization and cleanup for new views
+- Added example callbacks and data handling for each input type
+
+## Add C++ wrappers for Popup and ButtonMenu modules
+
+Added C++ wrappers for additional GUI modules to provide a consistent C++ interface:
+
+- Created PopupCpp wrapper for popup dialogs with timeout support
+- Created ButtonMenuCpp wrapper for button-based menu interface
+- Maintained consistent initialization and cleanup patterns
+- Added proper resource management with RAII
+
+## Add test views for Popup and ButtonMenu widgets
+
+Added example views demonstrating the usage of popup and button menu widgets:
+
+- Created EleventhView using PopupCpp for timed popup messages
+- Created TwelfthView using ButtonMenuCpp for button-based navigation
+- Updated ExampleCppViewApp to cycle through all twelve views
+- Added example callbacks and timeout handling
+- Added proper initialization and cleanup for new views

@@ -12,6 +12,8 @@
 #include "EighthView.hpp"
 #include "NinthView.hpp"
 #include "TenthView.hpp"
+#include "EleventhView.hpp"
+#include "TwelfthView.hpp"
 #include <gui/gui.h>
 #include <gui/view_dispatcher.h>
 
@@ -30,6 +32,8 @@ public:
         ViewEighth,
         ViewNinth,
         ViewTenth,
+        ViewEleventh,
+        ViewTwelfth,
     };
 
     enum class State {
@@ -43,6 +47,8 @@ public:
         Eighth,
         Ninth,
         Tenth,
+        Eleventh,
+        Twelfth,
     };
 
     ExampleCppViewApp() = default;
@@ -66,6 +72,8 @@ public:
         eighth_view.set_view_dispatcher(view_dispatcher);
         ninth_view.set_view_dispatcher(view_dispatcher);
         tenth_view.set_view_dispatcher(view_dispatcher);
+        eleventh_view.set_view_dispatcher(view_dispatcher);
+        twelfth_view.set_view_dispatcher(view_dispatcher);
 
         first_view.init();
         second_view.init();
@@ -77,6 +85,8 @@ public:
         eighth_view.init();
         ninth_view.init();
         tenth_view.init();
+        eleventh_view.init();
+        twelfth_view.init();
 
         // Add views
         view_dispatcher_add_view(view_dispatcher, ViewFirst, first_view.get_view());
@@ -89,10 +99,14 @@ public:
         view_dispatcher_add_view(view_dispatcher, ViewEighth, eighth_view.get_view());
         view_dispatcher_add_view(view_dispatcher, ViewNinth, ninth_view.get_view());
         view_dispatcher_add_view(view_dispatcher, ViewTenth, tenth_view.get_view());
+        view_dispatcher_add_view(view_dispatcher, ViewEleventh, eleventh_view.get_view());
+        view_dispatcher_add_view(view_dispatcher, ViewTwelfth, twelfth_view.get_view());
     }
 
     ~ExampleCppViewApp() {
         if(view_dispatcher != nullptr) {
+            view_dispatcher_remove_view(view_dispatcher, ViewTwelfth);
+            view_dispatcher_remove_view(view_dispatcher, ViewEleventh);
             view_dispatcher_remove_view(view_dispatcher, ViewTenth);
             view_dispatcher_remove_view(view_dispatcher, ViewNinth);
             view_dispatcher_remove_view(view_dispatcher, ViewEighth);
@@ -109,8 +123,8 @@ public:
     }
 
     void run() {
-        view_dispatcher_switch_to_view(view_dispatcher, ViewEighth);
-        state = State::Seventh;
+        view_dispatcher_switch_to_view(view_dispatcher, ViewEleventh);
+        state = State::Eleventh;
         view_dispatcher_run(view_dispatcher);
     }
 
@@ -125,6 +139,8 @@ private:
     EighthView eighth_view;
     NinthView ninth_view;
     TenthView tenth_view;
+    EleventhView eleventh_view;
+    TwelfthView twelfth_view;
     ViewDispatcher* view_dispatcher = nullptr;
     Gui* gui = nullptr;
     State state = State::First;
@@ -161,6 +177,12 @@ private:
             } else if(app->state == State::Ninth) {
                 app->state = State::Tenth;
                 view_dispatcher_switch_to_view(app->view_dispatcher, ViewTenth);
+            } else if(app->state == State::Tenth) {
+                app->state = State::Eleventh;
+                view_dispatcher_switch_to_view(app->view_dispatcher, ViewEleventh);
+            } else if(app->state == State::Eleventh) {
+                app->state = State::Twelfth;
+                view_dispatcher_switch_to_view(app->view_dispatcher, ViewTwelfth);
             } else {
                 app->state = State::First;
                 view_dispatcher_switch_to_view(app->view_dispatcher, ViewFirst);
