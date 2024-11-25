@@ -51,33 +51,33 @@ public:
         second_view.set_view_dispatcher(view_dispatcher);
         third_view.set_view_dispatcher(view_dispatcher);
         fourth_view.set_view_dispatcher(view_dispatcher);
-        // fifth_view.set_view_dispatcher(view_dispatcher);
-        // sixth_view.set_view_dispatcher(view_dispatcher);
-        // seventh_view.set_view_dispatcher(view_dispatcher);
+        fifth_view.set_view_dispatcher(view_dispatcher);
+        sixth_view.set_view_dispatcher(view_dispatcher);
+        seventh_view.set_view_dispatcher(view_dispatcher);
 
         first_view.init();
         second_view.init();
         third_view.init();
         fourth_view.init();
-        // fifth_view.init();
-        // sixth_view.init();
-        // seventh_view.init();
+        fifth_view.init();
+        sixth_view.init();
+        seventh_view.init();
 
         // Add views
         view_dispatcher_add_view(view_dispatcher, ViewFirst, first_view.get_view());
         view_dispatcher_add_view(view_dispatcher, ViewSecond, second_view.get_view());
         view_dispatcher_add_view(view_dispatcher, ViewThird, third_view.get_view());
         view_dispatcher_add_view(view_dispatcher, ViewFourth, fourth_view.get_view());
-        // view_dispatcher_add_view(view_dispatcher, ViewFifth, fifth_view.get_view());
-        // view_dispatcher_add_view(view_dispatcher, ViewSixth, sixth_view.get_view());
-        // view_dispatcher_add_view(view_dispatcher, ViewSeventh, seventh_view.get_view());
+        view_dispatcher_add_view(view_dispatcher, ViewFifth, fifth_view.get_view());
+        view_dispatcher_add_view(view_dispatcher, ViewSixth, sixth_view.get_view());
+        view_dispatcher_add_view(view_dispatcher, ViewSeventh, seventh_view.get_view());
     }
 
     ~ExampleCppViewApp() {
         if(view_dispatcher != nullptr) {
-            // view_dispatcher_remove_view(view_dispatcher, ViewSeventh);
-            // view_dispatcher_remove_view(view_dispatcher, ViewSixth);
-            // view_dispatcher_remove_view(view_dispatcher, ViewFifth);
+            view_dispatcher_remove_view(view_dispatcher, ViewSeventh);
+            view_dispatcher_remove_view(view_dispatcher, ViewSixth);
+            view_dispatcher_remove_view(view_dispatcher, ViewFifth);
             view_dispatcher_remove_view(view_dispatcher, ViewFourth);
             view_dispatcher_remove_view(view_dispatcher, ViewThird);
             view_dispatcher_remove_view(view_dispatcher, ViewSecond);
@@ -88,7 +88,8 @@ public:
     }
 
     void run() {
-        view_dispatcher_switch_to_view(view_dispatcher, ViewFirst);
+        view_dispatcher_switch_to_view(view_dispatcher, ViewSeventh);
+        state = State::Seventh;
         view_dispatcher_run(view_dispatcher);
     }
 
@@ -118,15 +119,15 @@ private:
             } else if(app->state == State::Third) {
                 app->state = State::Fourth;
                 view_dispatcher_switch_to_view(app->view_dispatcher, ViewFourth);
-            // } else if(app->state == State::Fourth) {
-            //     app->state = State::Fifth;
-            //     view_dispatcher_switch_to_view(app->view_dispatcher, ViewFifth);
-            // } else if(app->state == State::Fifth) {
-            //     app->state = State::Sixth;
-            //     view_dispatcher_switch_to_view(app->view_dispatcher, ViewSixth);
-            // } else if(app->state == State::Sixth) {
-            //     app->state = State::Seventh;
-            //     view_dispatcher_switch_to_view(app->view_dispatcher, ViewSeventh);
+            } else if(app->state == State::Fourth) {
+                app->state = State::Fifth;
+                view_dispatcher_switch_to_view(app->view_dispatcher, ViewFifth);
+            } else if(app->state == State::Fifth) {
+                app->state = State::Sixth;
+                view_dispatcher_switch_to_view(app->view_dispatcher, ViewSixth);
+            } else if(app->state == State::Sixth) {
+                app->state = State::Seventh;
+                view_dispatcher_switch_to_view(app->view_dispatcher, ViewSeventh);
             } else {
                 app->state = State::First;
                 view_dispatcher_switch_to_view(app->view_dispatcher, ViewFirst);
@@ -139,7 +140,16 @@ private:
     static bool navigation_callback(void* context) {
         furi_assert(context);
         ExampleCppViewApp* app = static_cast<ExampleCppViewApp*>(context);
-        view_dispatcher_stop(app->view_dispatcher);
+        // if not in sixth view, stop the view dispatcher
+        if(app->state == State::Sixth) {
+            view_dispatcher_switch_to_view(app->view_dispatcher, ViewSeventh);
+            app->state = State::Seventh;
+        } else if(app->state == State::Fifth) {
+            view_dispatcher_switch_to_view(app->view_dispatcher, ViewSixth);
+            app->state = State::Sixth;
+        } else {
+            view_dispatcher_stop(app->view_dispatcher);
+        }
         return true;
     }
 };
