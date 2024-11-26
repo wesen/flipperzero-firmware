@@ -118,6 +118,7 @@ public:
     ~ExampleCppViewApp() {
         if(view_dispatcher != nullptr) {
             view_dispatcher_remove_view(view_dispatcher, ViewWidget);
+            view_dispatcher_remove_view(view_dispatcher, ViewButtonPanel);
             view_dispatcher_remove_view(view_dispatcher, ViewTwelfth);
             view_dispatcher_remove_view(view_dispatcher, ViewEleventh);
             view_dispatcher_remove_view(view_dispatcher, ViewTenth);
