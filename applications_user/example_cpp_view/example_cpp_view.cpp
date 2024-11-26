@@ -12,7 +12,8 @@ ExampleCppViewApp::ViewMap ExampleCppViewApp::view_map[ViewCount] = {
     {ViewEleventh, nullptr, ViewTwelfth},
     {ViewTwelfth, nullptr, ViewButtonPanel},
     {ViewButtonPanel, nullptr, ViewWidget},
-    {ViewWidget, nullptr, ViewFirst},
+    {ViewWidget, nullptr, ViewVariableList},
+    {ViewVariableList, nullptr, ViewFirst},
 };
 
 ExampleCppViewApp::ExampleCppViewApp() {
@@ -34,7 +35,7 @@ ExampleCppViewApp::~ExampleCppViewApp() {
     }
 }
 
-ViewCpp* ExampleCppViewApp::get_view(ViewId id) {
+flipper::ViewCpp* ExampleCppViewApp::get_view(ViewId id) {
     return view_map[id].view;
 }
 
@@ -56,6 +57,7 @@ void ExampleCppViewApp::init() {
     view_map[ViewTwelfth].view = &twelfth_view;
     view_map[ViewButtonPanel].view = &button_panel_view;
     view_map[ViewWidget].view = &widget_view;
+    view_map[ViewVariableList].view = &variable_list_view;
 
     // Initialize all views
     for(size_t i = 0; i < ViewCount; i++) {
@@ -67,13 +69,13 @@ void ExampleCppViewApp::init() {
 }
 
 void ExampleCppViewApp::run() {
-    view_dispatcher_switch_to_view(view_dispatcher, ViewEleventh);
+    view_dispatcher_switch_to_view(view_dispatcher, ViewVariableList);
     view_dispatcher_run(view_dispatcher);
 }
 
 bool ExampleCppViewApp::switch_to_view(ViewId new_view_id) {
-    ViewCpp* current = get_view(current_view);
-    ViewCpp* next = get_view(new_view_id);
+    flipper::ViewCpp* current = get_view(current_view);
+    flipper::ViewCpp* next = get_view(new_view_id);
 
     if(current) {
         current->exit();
