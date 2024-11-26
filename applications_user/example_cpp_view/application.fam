@@ -8,6 +8,7 @@ App(
         "gui",
     ],
     stack_size=2 * 1024,
+    fap_icon_assets="icons",
     fap_category="Examples",
     fap_author="Your Name",
     fap_weburl="https://github.com/your_name/your_repo",

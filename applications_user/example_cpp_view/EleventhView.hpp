@@ -10,15 +10,15 @@ public:
 
     void init() override {
         PopupCpp::init();
-        
+
         set_header("Popup Test", 64, 10, AlignCenter, AlignCenter);
         set_text("This is a popup\nwith timeout", 64, 32, AlignCenter, AlignCenter);
-        set_icon(0, 12, &I_DolphinNice_96x59);
-        
+        set_icon(0, 12, &I_DolphinSaved_92x58);
+
         set_callback(popup_callback);
         set_context(this);
-        
-        set_timeout(3000);  // 3 seconds
+
+        set_timeout(3000); // 3 seconds
         enable_timeout();
     }
 
@@ -27,4 +27,4 @@ private:
         EleventhView* instance = static_cast<EleventhView*>(context);
         instance->send_custom_event(static_cast<uint32_t>(CustomEvent::ToggleScene));
     }
-}; 
+};
