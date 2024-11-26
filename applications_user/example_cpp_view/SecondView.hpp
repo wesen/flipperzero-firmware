@@ -1,6 +1,6 @@
 #pragma once
 
-#include "view_cpp.hpp"
+#include "views/view_cpp.hpp"
 #include "ViewModel.hpp"
 
 class SecondView : public flipper::ViewCpp {

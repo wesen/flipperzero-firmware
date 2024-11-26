@@ -1,6 +1,6 @@
 #pragma once
 
-#include "byte_input_cpp.hpp"
+#include "views/byte_input_cpp.hpp"
 #include "ViewModel.hpp"
 
 class EighthView : public flipper::ByteInputCpp {

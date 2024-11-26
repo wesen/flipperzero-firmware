@@ -67,7 +67,7 @@ void ExampleCppViewApp::init() {
 }
 
 void ExampleCppViewApp::run() {
-    view_dispatcher_switch_to_view(view_dispatcher, ViewWidget);
+    view_dispatcher_switch_to_view(view_dispatcher, ViewEleventh);
     view_dispatcher_run(view_dispatcher);
 }
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "number_input_cpp.hpp"
+#include "views/number_input_cpp.hpp"
 #include "ViewModel.hpp"
 
 class NinthView : public flipper::NumberInputCpp {

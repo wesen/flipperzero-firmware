@@ -1,6 +1,6 @@
 #pragma once
 
-#include "button_panel_cpp.hpp"
+#include "views/button_panel_cpp.hpp"
 #include "ViewModel.hpp"
 #include "example_cpp_view_icons.h"
 

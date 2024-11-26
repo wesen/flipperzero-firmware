@@ -1,6 +1,6 @@
 #pragma once
 
-#include "button_menu_cpp.hpp"
+#include "views/button_menu_cpp.hpp"
 #include "ViewModel.hpp"
 
 class TwelfthView : public flipper::ButtonMenuCpp {
