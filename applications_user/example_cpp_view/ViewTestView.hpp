@@ -3,9 +3,9 @@
 #include "../film_developer/views/view_cpp.hpp"
 #include "ViewModel.hpp"
 
-class FirstView : public flipper::ViewCpp {
+class ViewTestView : public flipper::ViewCpp {
 public:
-    FirstView() = default;
+    ViewTestView() = default;
 
     void init() override {
         ViewCpp::init();
@@ -48,4 +48,4 @@ protected:
 
 private:
     ViewModel initial_model;
-}; 
+};

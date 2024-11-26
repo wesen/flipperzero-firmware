@@ -3,9 +3,9 @@
 #include "../film_developer/views/view_cpp.hpp"
 #include "ViewModel.hpp"
 
-class SecondView : public flipper::ViewCpp {
+class View2TestView : public flipper::ViewCpp {
 public:
-    SecondView() = default;
+    View2TestView() = default;
 
     void init() override {
         ViewCpp::init();

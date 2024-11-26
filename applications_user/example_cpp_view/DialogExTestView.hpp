@@ -3,9 +3,9 @@
 #include "../film_developer/views/dialog_ex_cpp.hpp"
 #include "ViewModel.hpp"
 
-class FourthView : public flipper::DialogExCpp {
+class DialogExTestView : public flipper::DialogExCpp {
 public:
-    FourthView() = default;
+    DialogExTestView() = default;
 
     void init() override {
         DialogExCpp::init();
@@ -22,7 +22,7 @@ public:
 
 private:
     static void dialog_callback(DialogExResult result, void* context) {
-        FourthView* instance = static_cast<FourthView*>(context);
+        DialogExTestView* instance = static_cast<DialogExTestView*>(context);
 
         if(result == DialogExResultLeft || result == DialogExResultRight) {
             instance->send_custom_event(static_cast<uint32_t>(CustomEvent::ToggleScene));

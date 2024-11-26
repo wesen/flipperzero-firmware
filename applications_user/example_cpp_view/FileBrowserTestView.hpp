@@ -15,13 +15,13 @@ const uint8_t* const _I_badusb_10px[] = {_I_badusb_10px_0};
 const Icon I_badusb_10px =
     {.width = 10, .height = 10, .frame_count = 1, .frame_rate = 0, .frames = _I_badusb_10px};
 
-class SeventhView : public flipper::FileBrowserCpp {
+class FileBrowserTestView : public flipper::FileBrowserCpp {
 public:
-    SeventhView()
+    FileBrowserTestView()
         : FileBrowserCpp(furi_string_alloc()) {
     }
 
-    ~SeventhView() {
+    ~FileBrowserTestView() {
         if(result_path) {
             furi_string_free(result_path);
         }
@@ -52,7 +52,7 @@ protected:
 
 private:
     static void file_browser_callback(void* context) {
-        SeventhView* instance = static_cast<SeventhView*>(context);
+        FileBrowserTestView* instance = static_cast<FileBrowserTestView*>(context);
         instance->send_custom_event(static_cast<uint32_t>(CustomEvent::ToggleScene));
     }
 };

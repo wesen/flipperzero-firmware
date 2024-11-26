@@ -4,9 +4,9 @@
 #include "ViewModel.hpp"
 #include <assets_icons.h>
 
-class EleventhView : public flipper::PopupCpp {
+class PopupTestView : public flipper::PopupCpp {
 public:
-    EleventhView() = default;
+    PopupTestView() = default;
 
     void init() override {
         PopupCpp::init();
@@ -24,7 +24,7 @@ public:
 
 private:
     static void popup_callback(void* context) {
-        EleventhView* instance = static_cast<EleventhView*>(context);
+        PopupTestView* instance = static_cast<PopupTestView*>(context);
         instance->send_custom_event(static_cast<uint32_t>(CustomEvent::ToggleScene));
     }
 };

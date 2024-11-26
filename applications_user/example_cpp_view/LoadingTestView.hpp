@@ -3,12 +3,12 @@
 #include "../film_developer/views/loading_cpp.hpp"
 #include "ViewModel.hpp"
 
-class FifthView : public flipper::LoadingCpp {
+class LoadingTestView : public flipper::LoadingCpp {
 public:
-    FifthView() = default;
+    LoadingTestView() = default;
 
     void init() override {
         LoadingCpp::init();
         // Loading view is self-contained and auto-animates
     }
-}; 
+};

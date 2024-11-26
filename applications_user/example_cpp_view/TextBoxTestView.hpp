@@ -3,9 +3,9 @@
 #include "../film_developer/views/text_box_cpp.hpp"
 #include "ViewModel.hpp"
 
-class SixthView : public flipper::TextBoxCpp {
+class TextBoxTestView : public flipper::TextBoxCpp {
 public:
-    SixthView() = default;
+    TextBoxTestView() = default;
 
     void init() override {
         TextBoxCpp::init();
@@ -33,6 +33,6 @@ public:
 
 private:
     static bool input_callback(InputEvent* event, void* context) {
-        return static_cast<SixthView*>(context)->input(event);
+        return static_cast<TextBoxTestView*>(context)->input(event);
     }
 };

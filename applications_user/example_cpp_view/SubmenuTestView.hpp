@@ -3,14 +3,14 @@
 #include "../film_developer/views/submenu_cpp.hpp"
 #include "ViewModel.hpp"
 
-class ThirdView : public flipper::SubMenuCpp {
+class SubmenuTestView : public flipper::SubMenuCpp {
 public:
-    ThirdView() = default;
+    SubmenuTestView() = default;
 
     void init() override {
         SubMenuCpp::init();
         set_header("Menu View");
-        
+
         // Add some example menu items
         add_item("Option 1", 0, menu_callback, this);
         add_item("Option 2", 1, menu_callback, this);
@@ -20,9 +20,9 @@ public:
 
 private:
     static void menu_callback(void* context, uint32_t index) {
-        ThirdView* instance = static_cast<ThirdView*>(context);
+        SubmenuTestView* instance = static_cast<SubmenuTestView*>(context);
         if(index == 3) { // Switch View option
             instance->send_custom_event(static_cast<uint32_t>(CustomEvent::ToggleScene));
         }
     }
-}; 
+};

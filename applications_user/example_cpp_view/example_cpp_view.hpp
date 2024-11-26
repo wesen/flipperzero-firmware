@@ -1,5 +1,15 @@
 #pragma once
 
+#include "ButtonMenuTestView.hpp"
+#include "ByteInputTestView.hpp"
+#include "DialogExTestView.hpp"
+#include "FileBrowserTestView.hpp"
+#include "LoadingTestView.hpp"
+#include "NumberInputTestView.hpp"
+#include "PopupTestView.hpp"
+#include "TextBoxTestView.hpp"
+#include "TextInputTestView.hpp"
+#include "ViewTestView.hpp"
 #include <gui/gui.h>
 #include <gui/view_dispatcher.h>
 #include <gui/modules/submenu.h>
@@ -10,16 +20,6 @@
 #include <gui/modules/button_menu.h>
 #include <gui/modules/button_panel.h>
 
-#include "FirstView.hpp"
-#include "FourthView.hpp"
-#include "FifthView.hpp"
-#include "SixthView.hpp"
-#include "SeventhView.hpp"
-#include "EighthView.hpp"
-#include "NinthView.hpp"
-#include "TenthView.hpp"
-#include "EleventhView.hpp"
-#include "TwelfthView.hpp"
 #include "ButtonPanelView.hpp"
 #include "WidgetView.hpp"
 #include "VariableListTestView.hpp"
@@ -69,16 +69,16 @@ private:
     ViewId current_view = ViewFirst;
     ViewId previous_view = ViewFirst;
 
-    FirstView first_view;
-    FourthView fourth_view;
-    FifthView fifth_view;
-    SixthView sixth_view;
-    SeventhView seventh_view;
-    EighthView eighth_view;
-    NinthView ninth_view;
-    TenthView tenth_view;
-    EleventhView eleventh_view;
-    TwelfthView twelfth_view;
+    ViewTestView first_view;
+    DialogExTestView fourth_view;
+    LoadingTestView fifth_view;
+    TextBoxTestView sixth_view;
+    FileBrowserTestView seventh_view;
+    ByteInputTestView eighth_view;
+    NumberInputTestView ninth_view;
+    TextInputTestView tenth_view;
+    PopupTestView eleventh_view;
+    ButtonMenuTestView twelfth_view;
     ButtonPanelView button_panel_view;
     WidgetView widget_view;
     VariableListTestView variable_list_view;
