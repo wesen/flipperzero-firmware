@@ -1,6 +1,6 @@
 #pragma once
 
-#include "views/text_box_cpp.hpp"
+#include "../film_developer/views/text_box_cpp.hpp"
 #include "ViewModel.hpp"
 
 class SixthView : public flipper::TextBoxCpp {

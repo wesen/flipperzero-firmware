@@ -1,6 +1,6 @@
 #pragma once
 
-#include "views/popup_cpp.hpp"
+#include "../film_developer/views/popup_cpp.hpp"
 #include "ViewModel.hpp"
 #include <assets_icons.h>
 

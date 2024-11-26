@@ -1,6 +1,6 @@
 #pragma once
 
-#include "views/loading_cpp.hpp"
+#include "../film_developer/views/loading_cpp.hpp"
 #include "ViewModel.hpp"
 
 class FifthView : public flipper::LoadingCpp {

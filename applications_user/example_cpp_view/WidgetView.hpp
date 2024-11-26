@@ -1,6 +1,6 @@
 #pragma once
 
-#include "views/widget_cpp.hpp"
+#include "../film_developer/views/widget_cpp.hpp"
 #include "ViewModel.hpp"
 #include "example_cpp_view_icons.h"
 

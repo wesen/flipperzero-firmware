@@ -1,6 +1,6 @@
 #pragma once
 
-#include "views/submenu_cpp.hpp"
+#include "../film_developer/views/submenu_cpp.hpp"
 #include "ViewModel.hpp"
 
 class ThirdView : public flipper::SubMenuCpp {

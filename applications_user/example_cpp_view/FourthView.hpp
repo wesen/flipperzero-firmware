@@ -1,6 +1,6 @@
 #pragma once
 
-#include "views/dialog_ex_cpp.hpp"
+#include "../film_developer/views/dialog_ex_cpp.hpp"
 #include "ViewModel.hpp"
 
 class FourthView : public flipper::DialogExCpp {

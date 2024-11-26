@@ -1,6 +1,6 @@
 #pragma once
 
-#include "views/text_input_cpp.hpp"
+#include "../film_developer/views/text_input_cpp.hpp"
 #include "ViewModel.hpp"
 
 class TenthView : public flipper::TextInputCpp {

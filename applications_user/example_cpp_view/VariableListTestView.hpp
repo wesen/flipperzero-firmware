@@ -1,6 +1,6 @@
 #pragma once
 
-#include "views/variable_item_list_cpp.hpp"
+#include "../film_developer/views/variable_item_list_cpp.hpp"
 #include "ViewModel.hpp"
 
 class VariableListTestView : public flipper::VariableItemListCpp {

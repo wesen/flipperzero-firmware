@@ -1,6 +1,6 @@
 #pragma once
 
-#include "views/file_browser_cpp.hpp"
+#include "../film_developer/views/file_browser_cpp.hpp"
 #include "ViewModel.hpp"
 #include <storage/storage.h>
 
