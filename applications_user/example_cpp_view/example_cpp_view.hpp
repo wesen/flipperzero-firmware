@@ -15,6 +15,7 @@
 #include "EleventhView.hpp"
 #include "TwelfthView.hpp"
 #include "ButtonPanelView.hpp"
+#include "WidgetView.hpp"
 #include <gui/gui.h>
 #include <gui/view_dispatcher.h>
 
@@ -36,6 +37,7 @@ public:
         ViewEleventh,
         ViewTwelfth,
         ViewButtonPanel,
+        ViewWidget,
     };
 
     enum class State {
@@ -52,6 +54,7 @@ public:
         Eleventh,
         Twelfth,
         ButtonPanel,
+        Widget,
     };
 
     ExampleCppViewApp() = default;
@@ -79,6 +82,8 @@ public:
         twelfth_view.set_view_dispatcher(view_dispatcher);
         button_panel_view.set_view_dispatcher(view_dispatcher);
         button_panel_view.init();
+        widget_view.set_view_dispatcher(view_dispatcher);
+        widget_view.init();
 
         first_view.init();
         second_view.init();
@@ -107,11 +112,12 @@ public:
         view_dispatcher_add_view(view_dispatcher, ViewEleventh, eleventh_view.get_view());
         view_dispatcher_add_view(view_dispatcher, ViewTwelfth, twelfth_view.get_view());
         view_dispatcher_add_view(view_dispatcher, ViewButtonPanel, button_panel_view.get_view());
+        view_dispatcher_add_view(view_dispatcher, ViewWidget, widget_view.get_view());
     }
 
     ~ExampleCppViewApp() {
         if(view_dispatcher != nullptr) {
-            view_dispatcher_remove_view(view_dispatcher, ViewButtonPanel);
+            view_dispatcher_remove_view(view_dispatcher, ViewWidget);
             view_dispatcher_remove_view(view_dispatcher, ViewTwelfth);
             view_dispatcher_remove_view(view_dispatcher, ViewEleventh);
             view_dispatcher_remove_view(view_dispatcher, ViewTenth);
@@ -130,8 +136,8 @@ public:
     }
 
     void run() {
-        view_dispatcher_switch_to_view(view_dispatcher, ViewEleventh);
-        state = State::Eleventh;
+        view_dispatcher_switch_to_view(view_dispatcher, ViewWidget);
+        state = State::Widget;
         view_dispatcher_run(view_dispatcher);
     }
 
@@ -149,14 +155,14 @@ private:
     EleventhView eleventh_view;
     TwelfthView twelfth_view;
     ButtonPanelView button_panel_view;
+    WidgetView widget_view;
     ViewDispatcher* view_dispatcher = nullptr;
     Gui* gui = nullptr;
-    State state = State::First;
+    State state = State::Widget;
 
     static bool custom_callback(void* context, uint32_t event) {
         auto* app = static_cast<ExampleCppViewApp*>(context);
 
-        // Switch state
         if(event == static_cast<uint32_t>(CustomEvent::ToggleScene)) {
             if(app->state == State::First) {
                 app->state = State::Second;
@@ -194,6 +200,9 @@ private:
             } else if(app->state == State::Twelfth) {
                 app->state = State::ButtonPanel;
                 view_dispatcher_switch_to_view(app->view_dispatcher, ViewButtonPanel);
+            } else if(app->state == State::ButtonPanel) {
+                app->state = State::Widget;
+                view_dispatcher_switch_to_view(app->view_dispatcher, ViewWidget);
             } else {
                 app->state = State::First;
                 view_dispatcher_switch_to_view(app->view_dispatcher, ViewFirst);
