@@ -84,20 +84,19 @@ public:
         }
     }
 
-protected:
-    // Virtual methods to be implemented by derived classes
-    virtual void draw(Canvas* canvas, void* model) = 0;
-    virtual bool input(InputEvent* event) {
-        UNUSED(event);
-        return false;
+    virtual void enter() {
+    }
+    virtual void exit() {
     }
     virtual bool custom(uint32_t event) {
         UNUSED(event);
         return false;
     }
-    virtual void enter() {
-    }
-    virtual void exit() {
+    // Virtual methods to be implemented by derived classes
+    virtual void draw(Canvas* canvas, void* model) = 0;
+    virtual bool input(InputEvent* event) {
+        UNUSED(event);
+        return false;
     }
 
     // Model access helpers
@@ -120,6 +119,7 @@ protected:
         return ModelHandle<T>(view);
     }
 
+protected:
     View* view = nullptr;
     ViewDispatcher* view_dispatcher = nullptr;
 

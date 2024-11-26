@@ -584,3 +584,91 @@ Added example views demonstrating the usage of popup and button menu widgets:
 - Updated ExampleCppViewApp to cycle through all twelve views
 - Added example callbacks and timeout handling
 - Added proper initialization and cleanup for new views
+
+# Button Panel C++ Wrapper
+
+Added C++ wrapper for ButtonPanel module to provide an object-oriented interface for the button panel functionality. This makes it easier to create button grid interfaces in C++ applications while maintaining the underlying C implementation.
+
+- Created ButtonPanelCpp class wrapping ButtonPanel C module
+- Added ButtonPanelView as an example implementation
+- Maintained full feature parity with C implementation
+
+# Button Panel View Integration
+
+Added ButtonPanelView to example C++ application to demonstrate button grid interface:
+- Integrated ButtonPanelView into view cycle
+- Added proper state handling for button panel view
+- Used widget element icons for button display
+- Added view initialization and cleanup
+
+# Widget C++ Wrapper
+
+Added C++ wrapper for Widget module to provide an object-oriented interface for creating complex widget-based views:
+
+- Created WidgetCpp class wrapping Widget C module
+- Added support for all widget elements (text, icons, frames, buttons)
+- Added WidgetView as an example implementation
+- Maintained RAII pattern for resource management
+- Added proper type safety and modern C++ features
+
+# Widget View Integration
+
+Added WidgetView as the new startup view in example C++ application:
+- Set WidgetView as the initial view when app starts
+- Added proper state transitions to/from widget view
+- Integrated widget view into view cycle
+- Demonstrated multiple widget elements in a single view
+- Added frame, text, icon and button elements to showcase widget capabilities
+
+# Menu C++ Wrapper
+
+Added C++ wrapper for Menu module to provide an object-oriented interface for creating menu-based views:
+
+- Created MenuCpp class wrapping Menu C module
+- Added support for menu items with icons and callbacks
+- Added MenuView as an example implementation
+- Maintained RAII pattern for resource management
+- Added proper type safety and modern C++ features
+
+# Menu View Integration
+
+Added MenuView to example C++ application to demonstrate menu functionality:
+- Added MenuView to view cycle after Widget view
+- Added example menu items with icons
+- Added proper state transitions to/from menu view
+- Demonstrated menu callback handling
+- Added proper initialization and cleanup
+
+# View Management System Enhancement
+
+Improved the view management system to properly track current and previous views and handle view transitions with enter/exit callbacks.
+
+- Implemented proper view transition management using SceneManagerCpp
+- Added enter/exit callback handling during view switches
+- Simplified view management code structure
+- Removed redundant state tracking
+
+# View Transition Management
+
+Enhanced view transition handling in example_cpp_view app:
+- Added proper enter/exit callback handling during view transitions
+- Added tracking of current and previous views
+- Simplified view switching logic
+- Maintained existing view structure while improving transition management
+
+# View Management Simplification
+
+Simplified view management system using static mapping:
+- Added ViewMap structure to map view states to their transitions
+- Replaced switch statements with lookup tables
+- Added helper methods for view access and transitions
+- Simplified initialization and cleanup code
+- Reduced code duplication and improved maintainability
+
+# View Map Optimization
+
+Further simplified view management:
+- Removed redundant view array and switch statement
+- Made view_map the single source of truth for view management
+- Simplified view lookup and transition logic
+- Reduced code complexity and improved maintainability
